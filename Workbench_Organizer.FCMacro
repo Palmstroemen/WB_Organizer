@@ -1,0 +1,133 @@
+#
+# Workbench_Organizer
+#
+# A workbench to organize your workbenches.
+
+
+# ToDo ############################################################################
++ Den Config-Dialog überarbeiten. Zumindest einen [check File]-Button hinzufügen.
++ Die Checked Sache im Konfigurator auf das MyFile umbauen. (~ vor den WB-Namen wenn unchecked oder so.)
++ Die alten enabled, ischecked, ... Sachen rausnehmen und das Config-System säubern.
++ Defaults herausnehmen.
+
++ Dass er immer in der ersten Tabs-Zeile platziert wird und diese ganz ausfüllt.
++ Die Tabs alternativ auch als Dropdownliste darstellen
++ Das konfigurierbar machen.
++ Konfiguration (in Menü, in TabBar, free)
++ Icon für Konfigurator in der Dropdownliste
+
+Repo:
+C:\Users\Oliver R\Projekte\Programmieren\FreeCAD\WB_Organizer
+
+Dev:
+C:\Users\Oliver R\AppData\Roaming\FreeCAD\Mod\WB_Organizer
+
+
+
+#Gui.activateWorkbench(workbenchname)
+
+import os
+import json
+
+strAll = "Alle"
+strNew = "Neu"
+strLost= "Verloren gegangen"
+
+filepath = os.path.join(App.getUserAppDataDir(),"Mod/MyWorkbenches.txt")
+
+
+
+groupedWB = {}
+newWB     = []
+justWB    = []
+
+WB = Gui.listWorkbenches()
+
+for wb in WB:
+	justWB.append(wb)
+
+# Schreiben der formatierten Daten in eine Datei
+if not os.path.exists(filepath):
+	print("File not found: generating new File.")
+	groupedWB = {strNew: justWB, strAll: justWB, strLost: []}
+	# Formatieren der Daten mit Einrückung
+	formatted_data = json.dumps(groupedWB, indent=4)
+
+	with open(filepath, 'w') as f:
+	    f.write(formatted_data)
+
+else:	# a file already exists. Check for new and lost Workbenches
+	with open(filepath, 'r') as f:
+		groupedWB = json.load(f)
+		loadedAll = groupedWB.get(strAll)
+		groupedWB.update({strNew: []})
+		groupedWB.update({strAll: justWB})
+		lostWB    = [wb for wb in loadedAll]
+		for wb in WB:
+			if wb in loadedAll:
+				lostWB.remove(wb)
+			else:
+				newWB.append(wb)
+
+		if lostWB.__len__() > 0:
+			groupedWB.update({strLost: lostWB})
+
+		if newWB.__len__() > 0:
+			groupedWB.update({strNew: newWB})
+
+		formatted_data = json.dumps(groupedWB, indent=4)
+	
+		with open(filepath, 'w') as f:
+		    f.write(formatted_data)
+		
+print()
+#for group, wb in groupedWB.items():
+#	print(group, ": ", wb)
+for group in groupedWB.keys():
+	print(group)
+
+
+#-------------------------------------------------
+global toolbar1         ; toolbar1         = QtWidgets.QToolBar()  # tool bar
+
+
+comboBox_ToolBar = QtWidgets.QComboBox()
+	comboBox_ToolBar.addItem("km")
+	comboBox_ToolBar.addItem("hm")
+
+comboBox_ToolBar.setCurrentIndex(seT_System_IndexUnitLength)
+	QtCore.QObject.connect(comboBox_ToolBar, QtCore.SIGNAL("currentIndexChanged(QString)"), SIGNAL_comboBox_Changed)
+	##comboBox_ToolBar.setItemIcon(0, QIcon('C:/Users/Mario/AppData/Roaming/FreeCAD/Macro/Qt.png'))
+
+	toolbar1.addWidget(comboBox_ToolBar)
+
+
+
+#00000000000000000000000000000000000000000000000000000000000000000000000000
+#
+# A ChatGPT proposal to organize the toolbars so they do not get rearranged each time a workbench is activated.
+
+import json
+
+# Assume workbench_positions is a dictionary to store toolbar positions for each workbench
+workbench_positions = {}
+
+# Function to save toolbar positions for a workbench
+def save_toolbar_positions(workbench_name, toolbar_order):
+    workbench_positions[workbench_name] = toolbar_order
+
+# Function to load toolbar positions for a workbench
+def load_toolbar_positions(workbench_name):
+    return workbench_positions.get(workbench_name, [])
+
+# Example of how to use the functions
+workbench_name = "MyWorkbench"
+
+# Save current toolbar order
+current_order = ["ToolbarA", "ToolbarB", "ToolbarC"]
+save_toolbar_positions(workbench_name, current_order)
+
+# Load toolbar order for the workbench
+loaded_order = load_toolbar_positions(workbench_name)
+
+# Now, you can use the loaded_order to set the toolbar positions

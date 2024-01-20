@@ -1,0 +1,66 @@
+{
+    "Teile Konstruieren": [
+        "DraftWorkbench",
+        "PartWorkbench",
+        "PartDesignWorkbench",
+        "InventorWorkbench",
+        "Design456"
+    ],
+    "Analysieren": [
+        "FemWorkbench",
+        "OpenSCADWorkbench"
+    ],
+    "Zusammenstellungen": [
+        "ReverseEngineeringWorkbench",
+        "A2plusWorkbench",
+        "FastenersWorkbench",
+        "Lattice2Workbench",
+        "MakerWorkbench",
+        "ManipulatorWB",
+        "NodesWorkbench"
+    ],
+    "Alle": [
+        "AnimationFreeCAD",
+        "ArchWorkbench",
+        "DraftWorkbench",
+        "FemWorkbench",
+        "InspectionWorkbench",
+        "MeshWorkbench",
+        "OpenSCADWorkbench",
+        "PartWorkbench",
+        "PartDesignWorkbench",
+        "PathWorkbench",
+        "PointsWorkbench",
+        "ReverseEngineeringWorkbench",
+        "SketcherWorkbench",
+        "SpreadsheetWorkbench",
+        "RobotWorkbench",
+        "StartWorkbench",
+        "SurfaceWorkbench",
+        "TechDrawWorkbench",
+        "TestWorkbench",
+        "WebWorkbench",
+        "A2plusWorkbench",
+        "DynamicDataWorkbench",
+        "FastenersWorkbench",
+        "InventorWorkbench",
+        "Lattice2Workbench",
+        "MakerWorkbench",
+        "ManipulatorWB",
+        "NodesWorkbench",
+        "PovRayRendering",
+        "SMWorkbench",
+        "Silk",
+        "NoneWorkbench",
+        "Assembly4Workbench",
+        "CfdOFWorkbench",
+        "dodo",
+        "ExplodedAssembly"
+    ],
+    "Neu": [],
+    "Verloren gegangen": [
+        "Design456"
+    ],
+    "In Dropdown": [],
+    "disabled": []
+}
