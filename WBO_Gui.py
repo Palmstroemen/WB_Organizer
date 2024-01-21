@@ -17,6 +17,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
+print("WBO_Gui Start")
 """A workbench organizer for FreeCAD."""
 import FreeCADGui as Gui
 import FreeCAD as App
@@ -38,7 +39,6 @@ __pathToolbar__   = "User parameter:BaseApp/Workbench/Global/Toolbar"
 __parameters__    = App.ParamGet("User parameter:BaseApp/TabBar")
 __groupedWB__     = {}
 __newWB__         = []
-__justWB__        = []
 
 __actions__       = {}
 __mainWindow__    = Gui.getMainWindow()
