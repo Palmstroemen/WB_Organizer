@@ -21,6 +21,7 @@ Of course, you also find an 'All'-workbenches group to access workbenches the tr
 
 ## Preferences dialog
 A preferences dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
+
 ![](./Resources/images/WBO_preferences.png)
 
 To be honest, the preferences dialog at the moment is quite rudimentary.
@@ -44,6 +45,7 @@ That's NOT, what you want.
 UNDOCK your WBO from the toolbar and make it free floating! You could attach it to the top, the bottom or even to the sides of your main window. But that's NOT what you go for! 
 Move your WBO right at the very top into the header line of FreeCAD, right aside the FreeCAD-LOGO at the top left of your window. So your WBO will sit above your menu.
 Like so:
+
 ![](./Resources/images/WBO_top.png)
 
 Inside the 'preferences' dialog of the WBO on the right bottom side, you'll find a field to enter the **'Length of Workbench Organizer when free floating'**. This allows you to adopt the lenght of your TabBar to your screen size. 
@@ -51,20 +53,22 @@ Confirm your changes with [Shift] + [Return] for not leaving the whole dialog on
 
 As we can't hide the standard workbench selector we want to put it a little bit 'out of our sight' to the top right.
 Go to the configuration panel (menu -> edit -> configurations (or so?))
+
 ![](./Resources/images/WBO_to_config.png)
 
 1. Select the Workbench dialog (the 3rd from the top), ...
 2. scroll down to the very bottom of the list, and ...
 3. select inside the dropdown to place the selector widget to the **top right corner** of the window.
+
 ![](./Resources/images/WBO_config.png)
-We advice you to also check the 
 
 Now after a restart your old Workbench selector will sit in the top right corner like so:
+
 ![](./Resources/images/WBO_Start.png)
 
 There it is still available but won't disturb or confuse you.
 
-Finally you might consider to remove some useless buttons from the workbenches area like the file load and save buttons, the undo and redo buttons to save you some more screenspace. *(Won't you use [Ctrl]+[Z] for undo and [Ctrl]+[Y] for redo? So why waste your screen space with these buttons)*
+Finally you might consider to remove some useless buttons from the workbenches area like the file load and save buttons, the undo and redo buttons to save you some more screenspace. *(Won't you use [Ctrl]+[Z] for undo and [Ctrl]+[Y] for redo? So why waste your screen space with these buttons?)*
 
 Now you can try to **rearrange all your workbench buttons** in a way that they are not shuffled around on each workbench change. See how the upper left part of our workbenches remain static on the change of workbenches.
 
