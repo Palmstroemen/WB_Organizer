@@ -13,17 +13,60 @@ It also allows to present the workbenches in tabs or in a dropdown list.
 
 It allows to put **one workbench in multiple groups**. So i.e. the Spreadsheet-Workbench might appear in multiple groups.
 
-It even allows to put workbenches <u>into the group-selector dropdown</u>. This might be useful for workbenches like Spreadsheet that you might want to put in many groups.
+It even allows to put workbenches **into the group-selector dropdown**. This might be useful for workbenches like Spreadsheet that you might want to put in many groups.
 
-It further allows to <u>rename workbenches</u> whether to translate or to give it a - for you - more meaningful name. In the videos above you can see, that we have renamed several workbenches in German language. Like 'Spreadsheet' --> 'Tabellen'
+It further allows to **rename workbenches** whether to translate or to give it a - for you - more meaningful name. In the videos above you can see, that we have renamed several workbenches in German language. Like 'Spreadsheet' --> 'Tabellen'
 
 Of course, you also find an 'All'-workbenches group to access workbenches the traditional way.
 
 ## Preferences dialog
-A <u>WorkbenchOrganizer preferences</u> dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
+A preferences dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
 ![](./Resources/images/WBO_preferences.png)
 
 To be honest, the preferences dialog at the moment is quite rudimentary.
 For an introduction to how to create and modify your workbenches, see [instructions.txt](./Resources/Instructions.txt)
 
 _In case our WorkbenchOrganizer finds some fans, we'll continue to improve it. For the moment, this is our MVP (minimal valuable product)._
+
+
+## Tips how to use the Workbench-Organizer right now
+The WBO is a workbench by itself and thus would live inside the workbenches at the top of your window.
+The problem with this is, that workbenches are somehow reordered on each change of a workbench. This leads to your WBO jumping around.
+
+We haven't figured out yet how to fix the WBO in the very first line of the workbenches and how to reserve the full first line for it.
+So your WBO might all of a sudden collapse to a short widget forcing you to rearrange your workbenches again and again.
+
+That's NOT, what you want.
+
+### BUT ... there's a workaround for the moment.
+UNDOCK your WBO from the toolbar and make it free floating! You could attach it to the top, the bottom or even to the sides of your main window. But that's NOT what you go for! 
+Move your WBO right at the very top into the header line of FreeCAD, right aside the FreeCAD-LOGO at the top left of your window. So your WBO will sit above your menu.
+Like so:
+![](./Resources/images/WBO_top.png)
+
+Inside the 'preferences' dialog of the WBO on the right bottom side, you'll find a field to enter the **'Length of Workbench Organizer when free floating'**. This allows you to adopt the lenght of your TabBar to your screen size. 
+Confirm your changes with [Shift] + [Return] for not leaving the whole dialog on [Retur] and seeing an immediate result! 
+
+As we can't hide the standard workbench selector we want to put it a little bit 'out of our sight' to the top right.
+Go to the configuration panel (menu -> edit -> configurations (or so?))
+![](./Resources/images/WBO_to_config.png)
+
+- Select the Workbench dialog (the 3rd from the top), ...
+- scroll down to the very bottom of the list, and ...
+- select in the dropdown to place the selector widget to the **top right corner** of the window.
+![](./Resources/images/WBO_config.png)
+We advice you to also check the 
+
+Now after a restart your old Workbench selector will sit in the top right corner like so:
+![](./Resources/images/WBO_Start.png)
+There it is still available but won't disturb or confuse you.
+
+Finally you might consider to remove some useless buttons from the workbenches area like the file load and save buttons, the undo and redo buttons. To even save you some screenspace. (Won't you use [Ctrl]+[Z] for undo and [Ctrl]+[Y] for redo? So why waste your screen space with these buttons)
+
+Now you can try to **rearrange all your workbench buttons** in a way that they are not shuffled around on each workbench change. See how the upper left part of our workbenches remain static on the change of workbenches.
+![](./Resources/videos/WBO_in_action.gif)
+
+
+
+
+
