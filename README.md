@@ -2,29 +2,26 @@
 A workbench organizer widget for FreeCAD.
 
 The aim of the workbench organizer (WBO) is to organize the long list of workbenches into meaningful groups.
-<video width="486" height="308" controls>
-  <source src="./Resources/videos/WBO_dropdown.mp4" type="video/mp4">
-  Here you could see a video if only your browser would support this.
-</video>
-The WBO provides __workbench groups__ with an __additional selector__ to first select a group of workbenches which then allows to select a workbench from a (reduced) group of workbenches with the aim to make it easier to find your workbenches.
+
+![](./Resources/videos/WBO_dropdown.gif)
+
+The WBO provides <u>workbench groups</u> with an <u>additional selector</u> to first select a group of workbenches which then allows to select a workbench from a (reduced) group of workbenches with the aim to make it easier to find your workbenches.
 
 It also allows to present the workbenches in tabs or in a dropdown list.
-<video width="1034" height="296" controls>
-  <source src="./Resources/videos/WBO_tabs.mp4" type="video/mp4">
-  Here you could see a video if only your browser would support this.
-</video>
 
-It allows to put __one workbench in multiple groups__. So i.e. the Spreadsheet-Workbench might appear in multiple groups.
+![](./Resources/videos/WBO_tabs.gif)
 
-It even allows to put workbenches __into the group-selector dropdown__. This might be useful for workbenches like Spreadsheet that you might want to put in many groups.
+It allows to put <u>one workbench in multiple groups</u>. So i.e. the Spreadsheet-Workbench might appear in multiple groups.
 
-It further allows to __rename workbenches__ whether to translate or to give it a - for you - more meaningful name. In the videos above you can see, that we have renamed several workbenches in German language. Like 'Spreadsheet' --> 'Tabellen'
+It even allows to put workbenches <u>into the group-selector dropdown</u>. This might be useful for workbenches like Spreadsheet that you might want to put in many groups.
+
+It further allows to <u>rename workbenches</u> whether to translate or to give it a - for you - more meaningful name. In the videos above you can see, that we have renamed several workbenches in German language. Like 'Spreadsheet' --> 'Tabellen'
 
 Of course you also find a 'All'-workbenches group to access workbenches the traditional way.
 
 
-A __WorkbenchOrganizer preferences__ dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
-![Image],(./resources/images/WBP_preferences.png)
+A <u>WorkbenchOrganizer preferences</u> dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
+![],(./resources/images/WBP_preferences.png)
 
 To be honest, the preferences dialog at the moment is quite rudimentary.
 For an introduction on how to create and modify your workbenches, see [instructions.txt](./Resources/Instructions.txt)
