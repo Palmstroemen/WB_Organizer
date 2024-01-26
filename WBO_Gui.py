@@ -338,7 +338,7 @@ def tabs(groupName = __strAll__):
     global btn
     btn = QtGui.QPushButton(w)
     btn.setFlat(True)
-    btn.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Start.svg"))
+    btn.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_icon.svg"))
     btn.setStyleSheet("text-align: left;")
     if groupName == __strAll__:
         btn.setText("Select Group:")
