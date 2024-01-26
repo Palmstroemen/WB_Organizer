@@ -19,9 +19,9 @@ It further allows to <u>rename workbenches</u> whether to translate or to give i
 
 Of course, you also find an 'All'-workbenches group to access workbenches the traditional way.
 
-
+## Preferences dialog
 A <u>WorkbenchOrganizer preferences</u> dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
-![](./Resources/images/WBP_preferences.png)
+![](./Resources/images/WBO_preferences.png)
 
 To be honest, the preferences dialog at the moment is quite rudimentary.
 For an introduction to how to create and modify your workbenches, see [instructions.txt](./Resources/Instructions.txt)
