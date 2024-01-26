@@ -118,7 +118,16 @@
     ],
     "Neu": [],
     "Verloren gegangen": [
+        "WebToolsWorkbench",
+        "WorkFeatureWorkbench",
+        "GearWorkbench",
+        "FrameWorkbench",
+        "estimateWB",
+        "Assembly3Workbench",
+        "CADENAS3DfinditWorkbench",
         ""
     ],
-    "Disabled": []
+    "Disabled": [
+        "CfdOFWorkbench"
+    ]
 }

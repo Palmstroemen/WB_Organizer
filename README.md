@@ -1,27 +1,32 @@
 # WorkbenchOrganizer
-Workbench organizer widget for FreeCAD
+A workbench organizer widget for FreeCAD.
 
-### Installation:
+The aim of the workbench organizer (WBO) is to organize the long list of workbenches into meaningful groups.
+<video width="486" height="308" controls>
+  <source src="./Resources/videos/WBO_dropdown.mp4" type="video/mp4">
+  Here you could see a video if only your browser would support this.
+</video>
+The WBO provides __workbench groups__ with an __additional selector__ to first select a group of workbenches which then allows to select a workbench from a (reduced) group of workbenches with the aim to make it easier to find your workbenches.
 
-Install path for FreeCAD modules depends on the operating system used.
+It also allows to present the workbenches in tabs or in a dropdown list.
+<video width="1034" height="296" controls>
+  <source src="./Resources/videos/WBO_tabs.mp4" type="video/mp4">
+  Here you could see a video if only your browser would support this.
+</video>
 
-##### Examples:
+It allows to put __one workbench in multiple groups__. So i.e. the Spreadsheet-Workbench might appear in multiple groups.
 
-Linux:
+It even allows to put workbenches __into the group-selector dropdown__. This might be useful for workbenches like Spreadsheet that you might want to put in many groups.
 
-`/home/user/.FreeCAD/Mod/TabBar/InitGui.py`
+It further allows to __rename workbenches__ whether to translate or to give it a - for you - more meaningful name. In the videos above you can see, that we have renamed several workbenches in German language. Like 'Spreadsheet' --> 'Tabellen'
 
-macOS:
+Of course you also find a 'All'-workbenches group to access workbenches the traditional way.
 
-`/Users/user_name/Library/Preferences/FreeCAD/Mod/Tabbar/InitGui.py`
 
-Windows:
+A __WorkbenchOrganizer preferences__ dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
+![Image],(./resources/images/WBP_preferences.png)
 
-`C:\Users\user_name\AppData\Roaming\FreeCAD\Mod\TabBar\InitGui.py`
+To be honest, the preferences dialog at the moment is quite rudimentary.
+For an introduction on how to create and modify your workbenches, see [instructions.txt](./Resources/Instructions.txt)
 
-### Usage:
-
-The workbench organizer widget for FreeCAD provides workbench groups with an additional selector to group workbenches. 
-It also allows to present the workbenches in tabs or in a dropdown list. 
-It also allows to rename workbenches whether to translate or to give it a more meaningful name.
-WorkbenchOrganizer preferences are located under Accessories -> WorkbenchOrganizer.
+_In case our WorkbenchOrganizer finds some fans, we'll continue to improve it. For the moment, this is our MVP (minimal valuable product)._
