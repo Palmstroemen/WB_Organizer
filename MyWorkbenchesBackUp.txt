@@ -10,7 +10,6 @@
         "PartWorkbench",
         "PartDesignWorkbench",
         "InventorWorkbench",
-        "SMWorkbench",
         "SurfaceWorkbench",
         "Silk",
         "Design456",
@@ -20,6 +19,7 @@
         "ReverseEngineeringWorkbench",
         "MeshWorkbench",
         "FemWorkbench",
+        "OpenSCADWorkbench",
         "InspectionWorkbench",
         "CfdOFWorkbench",
         ""
@@ -27,15 +27,13 @@
     "Zusammenstellungen": [
         "SpreadsheetWorkbench",
         "A2plusWorkbench",
-        "Assembly3Workbench",
         "Assembly4Workbench",
         "FastenersWorkbench",
         "Lattice2Workbench",
-        "GearWorkbench",
         "MakerWorkbench",
-        "FrameWorkbench",
+        "ManipulatorWB",
         "dodo",
-        "estimateWB",
+        "NodesWorkbench",
         ""
     ],
     "Postproduction": [
@@ -50,7 +48,6 @@
         "SketcherWorkbench",
         "DraftWorkbench",
         "ArchWorkbench",
-        "CADENAS3DfinditWorkbench",
         ""
     ],
     "3D Print": [
@@ -67,7 +64,6 @@
         "PointsWorkbench",
         "ManipulatorWB",
         "NodesWorkbench",
-        "OpenSCADWorkbench",
         ""
     ],
     "Alle": [
@@ -107,13 +103,6 @@
         "CfdOFWorkbench",
         "dodo",
         "ExplodedAssembly",
-        "WebToolsWorkbench",
-        "WorkFeatureWorkbench",
-        "GearWorkbench",
-        "FrameWorkbench",
-        "estimateWB",
-        "Assembly3Workbench",
-        "CADENAS3DfinditWorkbench",
         ""
     ],
     "Neu": [],

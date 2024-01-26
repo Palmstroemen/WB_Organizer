@@ -21,4 +21,7 @@ Windows:
 
 ### Usage:
 
-The workbench organizer widget for FreeCAD provides workbench groups with an additional selector to group workbenches. It also allows to present the workbenches in tabs or in a dropdown list. WorkbenchOrganizer preferences are located under Accessories -> WorkbenchOrganizer.
+The workbench organizer widget for FreeCAD provides workbench groups with an additional selector to group workbenches. 
+It also allows to present the workbenches in tabs or in a dropdown list. 
+It also allows to rename workbenches whether to translate or to give it a more meaningful name.
+WorkbenchOrganizer preferences are located under Accessories -> WorkbenchOrganizer.
