@@ -17,13 +17,13 @@ It even allows to put workbenches <u>into the group-selector dropdown</u>. This 
 
 It further allows to <u>rename workbenches</u> whether to translate or to give it a - for you - more meaningful name. In the videos above you can see, that we have renamed several workbenches in German language. Like 'Spreadsheet' --> 'Tabellen'
 
-Of course you also find a 'All'-workbenches group to access workbenches the traditional way.
+Of course, you also find an 'All'-workbenches group to access workbenches the traditional way.
 
 
 A <u>WorkbenchOrganizer preferences</u> dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
 ![],(./resources/images/WBP_preferences.png)
 
 To be honest, the preferences dialog at the moment is quite rudimentary.
-For an introduction on how to create and modify your workbenches, see [instructions.txt](./Resources/Instructions.txt)
+For an introduction to how to create and modify your workbenches, see [instructions.txt](./Resources/Instructions.txt)
 
 _In case our WorkbenchOrganizer finds some fans, we'll continue to improve it. For the moment, this is our MVP (minimal valuable product)._
