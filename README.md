@@ -5,13 +5,13 @@ The aim of the workbench organizer (WBO) is to organize the long list of workben
 
 ![](./Resources/videos/WBO_dropdown.gif)
 
-The WBO provides <u>workbench groups</u> with an <u>additional selector</u> to first select a group of workbenches which then allows to select a workbench from a (reduced) group of workbenches with the aim to make it easier to find your workbenches.
+The WBO provides **workbench groups** with an **additional selector** to first select a group of workbenches which then allows to select a workbench from a (reduced) group of workbenches with the aim to make it easier to find your workbenches.
 
 It also allows to present the workbenches in tabs or in a dropdown list.
 
 ![](./Resources/videos/WBO_tabs.gif)
 
-It allows to put <u>one workbench in multiple groups</u>. So i.e. the Spreadsheet-Workbench might appear in multiple groups.
+It allows to put **one workbench in multiple groups**. So i.e. the Spreadsheet-Workbench might appear in multiple groups.
 
 It even allows to put workbenches <u>into the group-selector dropdown</u>. This might be useful for workbenches like Spreadsheet that you might want to put in many groups.
 
