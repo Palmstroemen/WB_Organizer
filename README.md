@@ -29,7 +29,7 @@ For an introduction to how to create and modify your workbenches, see [instructi
 
 _In case our WorkbenchOrganizer finds some fans, we'll continue to improve it. For the moment, this is our MVP (minimal valuable product)._
 
-**I especially like to kudos to TRIPUS who has provided several very exiting tools like the 'Glass' AddOn, the 'PieMenu' AddOn or the 'TabBar' Addon which this WBO is based on.** *The 'TabBar' AddOn has been kind of abandonned since 2017 or so. So I hijacked it and took it as starting point for the development of WBO which saved me a lot of time.*
+**I especially like to kudos to TRIPLUS who has provided several very exiting tools like the 'Glass' AddOn, the 'PieMenu' AddOn or the 'TabBar' Addon which this WBO is based on.** *The 'TabBar' AddOn has been kind of abandonned since 2017 or so. So I hijacked it and took it as starting point for the development of WBO which saved me a lot of time.*
 
 
 ## Tips how to use the Workbench-Organizer right now
