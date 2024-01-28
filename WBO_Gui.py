@@ -21,8 +21,7 @@ print("WBO_Gui Start")
 """A workbench organizer for FreeCAD."""
 import FreeCADGui as Gui
 import FreeCAD as App
-from PySide import QtGui, QtWidgets
-from PySide import QtCore
+from PySide import QtGui, QtWidgets, QtCore
 import os
 import json
 
@@ -843,7 +842,7 @@ def prefDialog():
     unchecked = __groupedWB__.get(__strDisabled__)
     if not unchecked: unchecked = {}  # prevents error in case __strDisabled__ has been changed
     position  = __groupedWB__.get(__strAll__)
-    if not position: position = {}  # prevents error in case __strAll__ has been changed
+    if not position: position = {}    # prevents error in case __strAll__ has been changed
 
 
     # build up the list of WB and set the CheckState        
