@@ -17,11 +17,10 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
-print("WBO_Gui Start")
 """A workbench organizer for FreeCAD."""
 import FreeCADGui as Gui
 import FreeCAD as App
-from PySide import QtGui, QtWidgets, QtCore
+from   PySide2 import QtGui, QtWidgets, QtCore
 import os
 import json
 
@@ -33,7 +32,7 @@ __strDisabled__= "Disabled"
 
 __pathGroupFile__ = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\MyWorkbenches.txt")
 __pathAliasFile__ = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\MyWorkbenchesRenaming.txt")
-__pathInstructions__ = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\Resources\\Instructions.txt")
+__pathInstruct__  = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\Resources\\Instructions.txt")
 __pathIcons__     = os.path.dirname(__file__) + "\\Resources\\icons\\"
 __pathToolbar__   = "User parameter:BaseApp/Workbench/Global/Toolbar"
 
@@ -43,7 +42,7 @@ __aliasNames__    = {}
 
 __actions__       = {}
 __mainWindow__    = Gui.getMainWindow()
-__tabActions__    = QtGui.QActionGroup(__mainWindow__)
+__tabActions__    = QtWidgets.QActionGroup(__mainWindow__)
 __selectedGroup__ = __strAll__      # the currently selected Group
 
 __floatingWidgetWidth__ = 700
@@ -216,7 +215,7 @@ def wbActions():
     for i in wbList:
         if i not in __actions__:
             try:
-                action = QtGui.QAction(__tabActions__)
+                action = QtWidgets.QAction(__tabActions__)
                 action.setCheckable(True)
                 action.setText(wbList[i].MenuText)
                 # replace original names by aliasNames
@@ -241,8 +240,8 @@ def onOrientationChanged(w):
 
     def layout():
         """Support menu for West and East orientations."""
-        wid = QtGui.QWidget()
-        lo  = QtGui.QVBoxLayout()
+        wid = QtWidgets.QWidget()
+        lo  = QtWidgets.QVBoxLayout()
         #spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         #lo.addItem(spacer)
         lo.addWidget(btn)
@@ -279,21 +278,21 @@ def onOrientationChanged(w):
         tb.addWidget(btn)
         tb.addWidget(tab)
         if prefbutton == "Tabs":
-            tab.setTabPosition(QtGui.QTabWidget.North)
+            tab.setTabPosition(QtWidgets.QTabWidget.North)
     elif orientation == "South":
         if prefbutton == "Tabs":
-            tab.setTabPosition(QtGui.QTabWidget.South)
+            tab.setTabPosition(QtWidgets.QTabWidget.South)
         tb.addWidget(btn)
         tb.addWidget(tab)
     elif orientation == "West":
         if prefbutton == "Tabs":
             tab.setLayoutDirection(QtCore.Qt.LeftToRight)
-            tab.setTabPosition(QtGui.QTabWidget.West)
+            tab.setTabPosition(QtWidgets.QTabWidget.West)
         layout()
     elif orientation == "East":
         if prefbutton == "Tabs":
             tab.setLayoutDirection(QtCore.Qt.LeftToRight)
-            tab.setTabPosition(QtGui.QTabWidget.East)
+            tab.setTabPosition(QtWidgets.QTabWidget.East)
         layout()
     else:
         pass
@@ -308,9 +307,9 @@ def onGroupSelected(group):
 
     btn.setText(group)
 
-    for i in tb.findChildren(QtGui.QTabWidget, "TabBar"):
+    for i in tb.findChildren(QtWidgets.QTabWidget, "TabBar"):
         i.deleteLater()
-    for i in tb.findChildren(QtGui.QWidgetAction):
+    for i in tb.findChildren(QtWidgets.QWidgetAction):
         i.deleteLater()
 
     ToolBarWidget = tabs(group)
@@ -330,12 +329,12 @@ def tabs(groupName = __strAll__):
     tb.clear()
     wbActions()
     
-    w = QtGui.QTabWidget(tb)
+    w = QtWidgets.QTabWidget(tb)
     activeWB = Gui.activeWorkbench().__class__.__name__   # this is the currently active workbench
 
     # DropdownMenu for Groups ===========================================================
     global btn
-    btn = QtGui.QPushButton(w)
+    btn = QtWidgets.QPushButton(w)
     btn.setFlat(True)
     btn.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_icon.svg"))
     btn.setStyleSheet("text-align: left;")
@@ -343,7 +342,7 @@ def tabs(groupName = __strAll__):
         btn.setText("Select Group:")
     else:
         btn.setText(groupName)
-    menu = QtGui.QMenu(btn)
+    menu = QtWidgets.QMenu(btn)
     btn.setMenu(menu)
 
     # Add some WB from the __strDrop__ group directly to the Groups-DropDown
@@ -366,7 +365,7 @@ def tabs(groupName = __strAll__):
     # Add the groups to the dropdown-menu
     for group in __groupedWB__.keys():
         if group not in [__strDrop__, __strLost__, __strNew__, __strDisabled__]:
-            gr = QtGui.QAction(menu)
+            gr = QtWidgets.QAction(menu)
             gr.setText(group)
             gr.setData(group)
             gr.triggered.connect(onGroupSelectedAction(group))
@@ -374,7 +373,7 @@ def tabs(groupName = __strAll__):
 
     menu.addSeparator()
 
-    pref = QtGui.QAction(menu)
+    pref = QtWidgets.QAction(menu)
     pref.setText("Preferences")
     pref.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Prefs.svg"))
     pref.triggered.connect(onPreferences)
@@ -388,11 +387,11 @@ def tabs(groupName = __strAll__):
     if prefbutton == 'Dropdown':
         # Dropdown ======================================================================
         global btnWB
-        btnWB = QtGui.QPushButton(w)
+        btnWB = QtWidgets.QPushButton(w)
         btnWB.setFlat(True)
         btnWB.setIcon(__actions__.get(activeWB).icon())
         btnWB.setText(__actions__.get(activeWB).text())
-        menu = QtGui.QMenu(btnWB)
+        menu = QtWidgets.QMenu(btnWB)
         btnWB.setMenu(menu)
 
         # Add some WB from the __strDrop__ group directly to the Groups-DropDown
@@ -463,9 +462,9 @@ def tabs(groupName = __strAll__):
 
 def onWorkbenchActivated():
     """Populate the tabs toolbar."""
-    for i in tb.findChildren(QtGui.QTabWidget, "TabBar"):
+    for i in tb.findChildren(QtWidgets.QTabWidget, "TabBar"):
         i.deleteLater()
-    for i in tb.findChildren(QtGui.QWidgetAction):
+    for i in tb.findChildren(QtWidgets.QWidgetAction):
         i.deleteLater()
     global __selectedGroup__
     ToolBarWidget = tabs(__selectedGroup__)
@@ -504,56 +503,56 @@ def openFileInEditor(filePath):
 def prefDialog():
     """Preferences dialog."""
     wbActions()
-    dialog = QtGui.QDialog(__mainWindow__)
+    dialog = QtWidgets.QDialog(__mainWindow__)
     dialog.setModal(True)
     dialog.resize(800, 450)
     dialog.setWindowTitle("WorkbenchOrganizer preferences")
-    layout = QtGui.QVBoxLayout()
+    layout = QtWidgets.QVBoxLayout()
     dialog.setLayout(layout)
     #------------------------
-    selector = QtGui.QListWidget(dialog)
+    selector = QtWidgets.QListWidget(dialog)
     selector.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
-    btnClose = QtGui.QPushButton("Close", dialog)
+    btnClose = QtWidgets.QPushButton("Close", dialog)
     btnClose.setToolTip("Close the preferences dialog")
     btnClose.setDefault(True)
 
-    btnUp = QtGui.QPushButton(dialog)
+    btnUp = QtWidgets.QPushButton(dialog)
     btnUp.setToolTip("Move selected item up")
     btnUp.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_MoveUp"))
 
-    btnDown = QtGui.QPushButton(dialog)
+    btnDown = QtWidgets.QPushButton(dialog)
     btnDown.setToolTip("Move selected item down")
     btnDown.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_MoveDown"))
 
-    btnInstructions = QtGui.QPushButton(dialog)
+    btnInstructions = QtWidgets.QPushButton(dialog)
     btnInstructions.setToolTip("Show instructions how to define groups")
     btnInstructions.setText("Show instructions")
 
-    btnFile = QtGui.QPushButton(dialog)
+    btnFile = QtWidgets.QPushButton(dialog)
     btnFile.setToolTip("Open and Edit the config-file")
     btnFile.setText("Open config-file")
 
-    btnTest = QtGui.QPushButton(dialog)
+    btnTest = QtWidgets.QPushButton(dialog)
     btnTest.setToolTip("Test if the config-file is correct")
     btnTest.setText("Test config-file")
 
-    btnResult = QtGui.QPushButton(dialog)
+    btnResult = QtWidgets.QPushButton(dialog)
     btnResult.setToolTip("Push to hide for next test.")
     btnResult.setText("")
     btnResult.setVisible(False)
 
-    txtResult = QtGui.QTextEdit(dialog)
+    txtResult = QtWidgets.QTextEdit(dialog)
     txtResult.setVisible(False)
     txtResult.setStyleSheet("color: #8B0000;")
 
     labelRename = QtWidgets.QLabel("Rename your WB here:")
 
-    btnRename = QtGui.QPushButton(dialog)
+    btnRename = QtWidgets.QPushButton(dialog)
     btnRename.setToolTip("Open and Edit the rename-file")
     btnRename.setText("Open rename-file")
 
-    btnTestRename = QtGui.QPushButton(dialog)
+    btnTestRename = QtWidgets.QPushButton(dialog)
     btnTestRename.setToolTip("Check the rename-file")
     btnTestRename.setText("Test rename-file")
 
@@ -561,7 +560,7 @@ def prefDialog():
     explication = QtWidgets.QLabel("<i>Confirm your data entry with [Shift] + [Return]<br>to keep the dialog window open.</i>")
     explication.setStyleSheet("color: lightgrey")
 
-    lineEdit = QtGui.QLineEdit(dialog)
+    lineEdit = QtWidgets.QLineEdit(dialog)
     lineEdit.setGeometry(QtCore.QRect(30, 40, 211, 22))
     lineEdit.setObjectName("Length of tab")
     lineEdit.setFixedWidth(100)
@@ -569,8 +568,8 @@ def prefDialog():
     #lineEdit.setIconText("Length of freefloating tab")
     lineEdit.setText(str(__floatingWidgetWidth__))
     #----------------------- Center Area
-    groupsPanel= QtGui.QGroupBox("Define your groups here:")
-    groupsButtons = QtGui.QVBoxLayout()
+    groupsPanel= QtWidgets.QGroupBox("Define your groups here:")
+    groupsButtons = QtWidgets.QVBoxLayout()
     groupsButtons.addWidget(btnInstructions)
     groupsButtons.addWidget(btnFile)
     groupsButtons.addWidget(btnTest)
@@ -582,16 +581,16 @@ def prefDialog():
     groupsButtons.addStretch()
     groupsPanel.setLayout(groupsButtons)
     #--------------------------------------------------------------
-    l0 = QtGui.QHBoxLayout()
-    stylePanel = QtGui.QGroupBox("Style:")
+    l0 = QtWidgets.QHBoxLayout()
+    stylePanel = QtWidgets.QGroupBox("Style:")
     stylePanel.setLayout(l0)
-    r0 = QtGui.QRadioButton("Icon", stylePanel)
+    r0 = QtWidgets.QRadioButton("Icon", stylePanel)
     r0.setObjectName("Icon")
     r0.setToolTip("Show just icon in tabbar.")
-    r1 = QtGui.QRadioButton("Text", stylePanel)
+    r1 = QtWidgets.QRadioButton("Text", stylePanel)
     r1.setObjectName("Text")
     r1.setToolTip("Show just text in tabbar.")
-    r2 = QtGui.QRadioButton("Icon and text", stylePanel)
+    r2 = QtWidgets.QRadioButton("Icon and text", stylePanel)
     r2.setObjectName("IconText")
     r2.setToolTip("Show icon and text in tabbar")
     l0.addWidget(r0)
@@ -599,22 +598,22 @@ def prefDialog():
     l0.addWidget(r2)
     #-----------------------
     """
-    l1 = QtGui.QVBoxLayout()
-    orientationPanel = QtGui.QGroupBox("Tab orientation:")
+    l1 = QtWidgets.QVBoxLayout()
+    orientationPanel = QtWidgets.QGroupBox("Tab orientation:")
     orientationPanel.setLayout(l1)
-    r3 = QtGui.QRadioButton("Auto", orientationPanel)
+    r3 = QtWidgets.QRadioButton("Auto", orientationPanel)
     r3.setObjectName("Auto")
     r3.setToolTip("Set based on the orientation")
-    r4 = QtGui.QRadioButton("Top", orientationPanel)
+    r4 = QtWidgets.QRadioButton("Top", orientationPanel)
     r4.setObjectName("North")
     r4.setToolTip("Tabs at top")
-    r5 = QtGui.QRadioButton("Bottom", orientationPanel)
+    r5 = QtWidgets.QRadioButton("Bottom", orientationPanel)
     r5.setObjectName("South")
     r5.setToolTip("Tabs at bottom")
-    r6 = QtGui.QRadioButton("Left", orientationPanel)
+    r6 = QtWidgets.QRadioButton("Left", orientationPanel)
     r6.setObjectName("West")
     r6.setToolTip("Tabs at left")
-    r7 = QtGui.QRadioButton("Right", orientationPanel)
+    r7 = QtWidgets.QRadioButton("Right", orientationPanel)
     r7.setObjectName("East")
     r7.setToolTip("Tabs at right")
     l1.addWidget(r3)
@@ -624,25 +623,25 @@ def prefDialog():
     l1.addWidget(r7)
     """
     #-----------------------
-    buttonsPanel = QtGui.QHBoxLayout()    # die untere Leiste mit den Up/down und Close-Buttons
+    buttonsPanel = QtWidgets.QHBoxLayout()    # die untere Leiste mit den Up/down und Close-Buttons
     buttonsPanel.addWidget(btnUp)
     buttonsPanel.addWidget(btnDown)
     buttonsPanel.addStretch(1)
     buttonsPanel.addWidget(btnClose)
     #-----------------------
-    l3 = QtGui.QHBoxLayout()
+    l3 = QtWidgets.QHBoxLayout()
     l3.addStretch()
-    l4 = QtGui.QVBoxLayout()
+    l4 = QtWidgets.QVBoxLayout()
     l4.addWidget(stylePanel)
     #l4.addWidget(g1)
     #----------------------- Right Area
-    showWBPanel = QtGui.QVBoxLayout()
-    g6 = QtGui.QGroupBox("Show Workbenches as Tabs or as Dropdown:")
+    showWBPanel = QtWidgets.QVBoxLayout()
+    g6 = QtWidgets.QGroupBox("Show Workbenches as Tabs or as Dropdown:")
     g6.setLayout(showWBPanel)
-    r8 = QtGui.QRadioButton("Tabs", g6)
+    r8 = QtWidgets.QRadioButton("Tabs", g6)
     r8.setObjectName("Tabs")
     r8.setToolTip("Show the workbenches in a tabbar")
-    r9 = QtGui.QRadioButton("Dropdown", g6)
+    r9 = QtWidgets.QRadioButton("Dropdown", g6)
     r9.setObjectName("Dropdown")
     r9.setToolTip("Show the workbenches in a dropdownlist")
     showWBPanel.addWidget(r9)
@@ -654,7 +653,7 @@ def prefDialog():
     l4.addStretch()
     l4.insertLayout(0, l3)
     #--------------------------------------
-    l5 = QtGui.QHBoxLayout()
+    l5 = QtWidgets.QHBoxLayout()
     l5.addWidget(selector)      # All List
     l5.addWidget(groupsPanel)   # Groups
     l5.insertLayout(2, l4)      # Radio-Buttons
@@ -663,7 +662,7 @@ def prefDialog():
     #layout.insertLayout(1, buttonsPanel)  # die untere Lesite mit den Buttons
 
     # Create a top-level horizontal layout
-    top_layout = QtGui.QHBoxLayout()
+    top_layout = QtWidgets.QHBoxLayout()
 
     # Add the left and right areas to the top-level layout
     top_layout.insertLayout(0, l5)  # die beiden Bereiche Links Liste, Rechts Radio-Buttons
@@ -789,7 +788,7 @@ def prefDialog():
 
     def onShowInstructions():
         """Open the configuration file"""
-        openFileInEditor(__pathInstructions__)
+        openFileInEditor(__pathInstruct__)
 
 
     def on_lineEdit_clicked():
@@ -803,7 +802,7 @@ def prefDialog():
     def onstylePanel(r):
         """Set TabBar style."""
         if r:
-            for i in stylePanel.findChildren(QtGui.QRadioButton):
+            for i in stylePanel.findChildren(QtWidgets.QRadioButton):
                 if i.isChecked():
                     __parameters__.SetString("Style", i.objectName())
             onWorkbenchActivated()
@@ -812,7 +811,7 @@ def prefDialog():
     def onOrientationPanel(r):
         #Set TabBar orientation.
         if r:
-            for i in orientationPanel.findChildren(QtGui.QRadioButton):
+            for i in orientationPanel.findChildren(QtWidgets.QRadioButton):
                 if i.isChecked():
                     __parameters__.SetString("Orientation", i.objectName())
             onWorkbenchActivated()
@@ -821,7 +820,7 @@ def prefDialog():
     def onG6(r):
         """Set pref button."""
         if r:
-            for i in g6.findChildren(QtGui.QRadioButton):
+            for i in g6.findChildren(QtWidgets.QRadioButton):
                 if i.isChecked():
                     __parameters__.SetString("PrefButton", i.objectName())
             onWorkbenchActivated()
@@ -848,7 +847,7 @@ def prefDialog():
     # build up the list of WB and set the CheckState        
     for i in position:
         if i in __actions__:
-            item = QtGui.QListWidgetItem(selector)
+            item = QtWidgets.QListWidgetItem(selector)
             item.setText(__actions__[i].text())
             item.setIcon(__actions__[i].icon())
             item.setData(32, __actions__[i].data())
@@ -924,7 +923,7 @@ def onPreferences():
 
 def accessoriesMenu():
     """Add WorkbenchOrganizer preferences to accessories menu."""
-    pref = QtGui.QAction(__mainWindow__)
+    pref = QtWidgets.QAction(__mainWindow__)
     pref.setText("WorkbenchOrganizer")
     pref.setObjectName("WorkbenchOrganizer")
     pref.triggered.connect(onPreferences)
@@ -932,15 +931,15 @@ def accessoriesMenu():
         import AccessoriesMenu
         AccessoriesMenu.addItem("WorkbenchOrganizer")
     except ImportError:
-        a = __mainWindow__.findChild(QtGui.QAction, "AccessoriesMenu")
+        a = __mainWindow__.findChild(QtWidgets.QAction, "AccessoriesMenu")
         if a:
             a.menu().addAction(pref)
         else:
             mb = __mainWindow__.menuBar()
-            actionAccessories = QtGui.QAction(__mainWindow__)
+            actionAccessories = QtWidgets.QAction(__mainWindow__)
             actionAccessories.setObjectName("AccessoriesMenu")
             actionAccessories.setIconText("Accessories")
-            menu = QtGui.QMenu()
+            menu = QtWidgets.QMenu()
             actionAccessories.setMenu(menu)
             menu.addAction(pref)
 
@@ -966,7 +965,7 @@ def onStart():
         __mainWindow__.workbenchActivated
         __mainWindow__.mainWindowClosed
         global tb
-        tb = __mainWindow__.findChild(QtGui.QToolBar, "Tabs")
+        tb = __mainWindow__.findChild(QtWidgets.QToolBar, "Tabs")
         tb.orientation
         start = True
     except AttributeError:
