@@ -1,5 +1,5 @@
 # WBO Workbench-Organizer widget for FreeCAD
-# Copyright (C) 2015, 2016, 2017, 2018 triplus @ FreeCAD who provided
+# Copyright (C) 2015, 2016, 2017, 2018 by triplus @ FreeCAD who provided
 # the wonderful TabBar widget on which this is based.
 # Copyright (C) 2024 Oliver Rafelsberger
 #

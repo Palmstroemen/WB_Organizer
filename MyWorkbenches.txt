@@ -4,8 +4,6 @@
         ""
     ],
     "Teile Konstruieren": [
-        "SpreadsheetWorkbench",
-        "SketcherWorkbench",
         "DraftWorkbench",
         "PartWorkbench",
         "PartDesignWorkbench",
