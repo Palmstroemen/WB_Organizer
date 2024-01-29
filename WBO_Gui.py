@@ -48,7 +48,7 @@ __selectedGroup__ = __strAll__      # the currently selected Group
 __floatingWidgetWidth__ = 700
 
 #----------------------------------------------------------
-class TabBar(QtWidgets.QTabBar):
+class WBO(QtWidgets.QTabBar):
     def tabSizeHint(self, index):
         s = QtWidgets.QTabBar.tabSizeHint(self, index)
         s.transpose()
