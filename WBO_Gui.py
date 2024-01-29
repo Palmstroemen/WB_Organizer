@@ -18,17 +18,18 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
 """A workbench organizer for FreeCAD."""
+"""Group and rename your workbenches as you like!"""
+
 import FreeCADGui as Gui
 import FreeCAD as App
 from   PySide2 import QtGui, QtWidgets, QtCore
-import os
-import json
+import os, json
 
-__strAll__ = "Alle"
-__strNew__ = "Neu"
-__strLost__= "Verloren gegangen"
-__strDrop__= "In Dropdown"
-__strDisabled__= "Disabled"
+__strAll__        = "WBO All"
+__strDrop__       = "WBO In Groups Dropdown"
+__strNew__        = "WBO New"
+__strLost__       = "WBO Lost"
+__strDisabled__   = "WBO Disabled"
 
 __pathGroupFile__ = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\MyWorkbenches.txt")
 __pathAliasFile__ = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\MyWorkbenchesRenaming.txt")
@@ -43,9 +44,8 @@ __aliasNames__    = {}
 __actions__       = {}
 __mainWindow__    = Gui.getMainWindow()
 __tabActions__    = QtWidgets.QActionGroup(__mainWindow__)
-__selectedGroup__ = __strAll__      # the currently selected Group
 
-__floatingWidgetWidth__ = 700
+__floatingWidgetWidth__ = 1330
 
 #----------------------------------------------------------
 class WBO(QtWidgets.QTabBar):
@@ -79,7 +79,7 @@ class WBO(QtWidgets.QTabBar):
 class TabWidget(QtWidgets.QTabWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QTabWidget.__init__(self, *args, **kwargs)
-        self.setTabBar(TabBar(self))
+        self.setTabBar(WBO(self))
         self.setTabPosition(QtWidgets.QTabWidget.West)
 #--------------------------------------------------------------------
 
@@ -99,6 +99,7 @@ def openMyWB():
     justWB.append("")
     newWB     = []
     global __groupedWB__
+    global __aliasNames__, __strAll__, __strDrop__, __strNew__, __strLost__, __strDisabled__
 
     # Schreiben der formatierten Daten in eine Datei
     if not os.path.exists(__pathGroupFile__):
@@ -141,7 +142,6 @@ def openMyWB():
                 # Handle the error accordingly	
                 print("ERROR on opening config-file.")
 
-    global __aliasNames__
     if not os.path.exists(__pathAliasFile__):
         # generate a template file for renaming WB.
         print("Renaming-file not found: generating new Template.")
@@ -155,14 +155,16 @@ def openMyWB():
     else:	# a file already exists. Check for new and lost Workbenches
         with open(__pathAliasFile__, 'r') as f:
             try: 
-                __aliasNames__ = json.load(f)
+                __aliasNames__  = json.load(f)
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON: {e}")
             except Exception as e:
                 print(f"Error: {e}")
                 # Add more specific exceptions if needed
                 # Handle the error accordingly	
-                
+
+    global __selectedGroup__            
+    __selectedGroup__ = __strAll__      # the currently selected Group
     return __groupedWB__
 
 __groupedWB__  = openMyWB()
@@ -367,6 +369,8 @@ def tabs(groupName = __strAll__):
         if group not in [__strDrop__, __strLost__, __strNew__, __strDisabled__]:
             gr = QtWidgets.QAction(menu)
             gr.setText(group)
+            if group == __strAll__:
+                gr.setText(__aliasNames__.get(__strAll__))
             gr.setData(group)
             gr.triggered.connect(onGroupSelectedAction(group))
             menu.addAction(gr)

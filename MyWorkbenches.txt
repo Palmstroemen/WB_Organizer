@@ -1,9 +1,9 @@
 {
-    "In Dropdown": [
+    "WBO In Groups Dropdown": [
         "SpreadsheetWorkbench",
         ""
     ],
-    "Teile Konstruieren": [
+    "Construct parts": [
         "DraftWorkbench",
         "PartWorkbench",
         "PartDesignWorkbench",
@@ -14,7 +14,7 @@
         "Design456",
         ""
     ],
-    "Analysieren": [
+    "Analyze": [
         "ReverseEngineeringWorkbench",
         "MeshWorkbench",
         "FemWorkbench",
@@ -22,7 +22,7 @@
         "CfdOFWorkbench",
         ""
     ],
-    "Zusammenstellungen": [
+    "Assemble multiple parts": [
         "SpreadsheetWorkbench",
         "A2plusWorkbench",
         "Assembly3Workbench",
@@ -61,14 +61,14 @@
         "ReverseEngineeringWorkbench",
         ""
     ],
-    "Spezielle Tools": [
+    "Special Tools": [
         "PointsWorkbench",
         "ManipulatorWB",
         "NodesWorkbench",
         "OpenSCADWorkbench",
         ""
     ],
-    "Alle": [
+    "WBO All": [
         "AnimationFreeCAD",
         "ArchWorkbench",
         "DraftWorkbench",
@@ -114,8 +114,8 @@
         "CADENAS3DfinditWorkbench",
         ""
     ],
-    "Neu": [],
-    "Verloren gegangen": [
+    "WBO New": [],
+    "WBO Lost": [
         "WebToolsWorkbench",
         "WorkFeatureWorkbench",
         "GearWorkbench",
@@ -125,7 +125,7 @@
         "CADENAS3DfinditWorkbench",
         ""
     ],
-    "Disabled": [
+    "WBO Disabled": [
         "CfdOFWorkbench"
     ]
 }

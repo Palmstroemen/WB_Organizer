@@ -41,7 +41,7 @@ So your WBO might all of a sudden collapse to a short widget forcing you to rear
 
 That's NOT, what you want.
 
-### BUT ... there's a workaround for the moment.
+### BUT ... there's a workaround for the moment!
 UNDOCK your WBO from the toolbar and make it free floating! You could attach it to the top, the bottom or even to the sides of your main window. But that's NOT what you go for! 
 Move your WBO right at the very top into the header line of FreeCAD, right aside the FreeCAD-LOGO at the top left of your window. So your WBO will sit above your menu.
 Like so:
@@ -77,5 +77,26 @@ Now you can try to **rearrange all your workbench buttons** in a way that they a
 
 We hope WBO helps you to get things done faster and with more pleasure and fun as you do not need to scroll so much on the search for your workbenches.
 
+## Renaming workbenches
+You can rename your workbenches to give them a more meaningful name or to translate their name into your language.
 
+As of now, you need to edit the file 'MyWorkbenchesRenaming.txt' manually.
+You can easily open and check this file from within the preferences dialog.
+To add a translation to this list, the best way to do it is, to copy the workbench name from the 'WBO All' list of the other 'MyWorkbenches.txt' file to avoid mispellings. Then paste it to the list and insert ': "yourNewWorbenchName" before the ',' comma that must end each line.
+
+To remove your new name, you can simply replace your name by an empty ""-string or you can delet the whole line from the list.
+
+## Renaming groups
+In general you can name your groups as you like.
+
+There are 5 special groups used by the WBO. Please do NOT RENAME THESE.
+*) WBO_Drop     (workbenches that shall be iside the groups dropdownlist)
+*) WBO_All      (all currently recognized and activated workbenches)
+*) WBO_New      (since last actualization newly registered workbenches)
+*) WBO_Lost     (workbenches you have deactivated or deinstalled)
+*) WBO_Disabled (workbenches you have disabled WITHIN WBO!)
+
+However, the only visible group of these 5 grous is the WBO_All group.
+You can assign this group an aliasName or translation into your language by
+editing the MyWorkbenchesRenaming.txt file. There's an entry for that.
 
