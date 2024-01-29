@@ -114,7 +114,7 @@
         "CADENAS3DfinditWorkbench",
         ""
     ],
-    "WBO New": [],
+    "WBO New": [""],
     "WBO Lost": [
         "WebToolsWorkbench",
         "WorkFeatureWorkbench",
@@ -126,6 +126,7 @@
         ""
     ],
     "WBO Disabled": [
-        "CfdOFWorkbench"
+        "CfdOFWorkbench",
+        ""
     ]
 }

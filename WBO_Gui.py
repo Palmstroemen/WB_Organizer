@@ -76,14 +76,16 @@ class WBO(QtWidgets.QTabBar):
             painter.drawControl(QtWidgets.QStyle.CE_TabBarTabLabel, opt)
             painter.restore()
 
+    def Deactivated(self):
+        # is called whenever the Workbench is deactivated.
+        return
+
 class TabWidget(QtWidgets.QTabWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QTabWidget.__init__(self, *args, **kwargs)
         self.setTabBar(WBO(self))
         self.setTabPosition(QtWidgets.QTabWidget.West)
 #--------------------------------------------------------------------
-
-
 
 def saveMyWB():
         # Formatieren der Daten mit Einrückung
@@ -101,6 +103,11 @@ def openMyWB():
     global __groupedWB__
     global __aliasNames__, __strAll__, __strDrop__, __strNew__, __strLost__, __strDisabled__
 
+    if not __parameters__.GetString("PrefButton"):
+        __parameters__.SetString("floatingWidth", "1000")
+        __parameters__.SetString("PrefButton", "Dropdown")
+        __parameters__.SetString("Style", "IconText")
+
     # Schreiben der formatierten Daten in eine Datei
     if not os.path.exists(__pathGroupFile__):
         print("Config-file not found: generating new template.")
@@ -112,8 +119,8 @@ def openMyWB():
             try: 
                 __groupedWB__ = json.load(f)
                 loadedAll     = __groupedWB__.get(__strAll__)
-                loadedAll.remove("")
-                loadedAll.append("")
+                loadedAll.append("")    # ["a","","b","c",""]
+                loadedAll.remove("")    # ["a","b","c",""]
                 __groupedWB__.update({__strNew__: []})
                 lostWB    = [wb for wb in loadedAll]
                 for wb in WB:
@@ -123,14 +130,14 @@ def openMyWB():
                         newWB.append(wb)
                         loadedAll.append(wb)
         
-                if lostWB.__len__() > 0:
-                    lostWB.remove("")
+                if lostWB:
                     lostWB.append("")
+                    lostWB.remove("")
                     __groupedWB__.update({__strLost__: lostWB})
         
-                if newWB.__len__() > 0:
-                    newWB.remove("")
+                if newWB:
                     newWB.append("")
+                    newWB.remove("")
                     __groupedWB__.update({__strNew__: newWB})
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON: {e}")
@@ -271,7 +278,7 @@ def onOrientationChanged(w):
 
     if tb.isFloating():
         global __floatingWidgetWidth__
-        __floatingWidgetWidth__ = int(__parameters__.GetString("floatingWidth", "700"))
+        __floatingWidgetWidth__ = int(__parameters__.GetString("floatingWidth", "1000"))
         tb.resize(__floatingWidgetWidth__, tb.height())
         orientation = "South"
 
@@ -432,12 +439,12 @@ def tabs(groupName = __strAll__):
         if not unchecked: unchecked = {}  # prevents error in case __strDisabled__ has been changed
         for i in groupWB:
             if i in __actions__ and i not in unchecked:
-                if __parameters__.GetString("Style") == "IconText":
-                    r = w.tabBar().addTab(__actions__[i].icon(), __actions__[i].text())
+                if __parameters__.GetString("Style") == "Icon":
+                    r = w.tabBar().addTab(__actions__[i].icon(), None)
                 elif __parameters__.GetString("Style") == "Text":
                     r = w.tabBar().addTab(__actions__[i].text())
                 else:
-                    r = w.tabBar().addTab(__actions__[i].icon(), None)
+                    r = w.tabBar().addTab(__actions__[i].icon(), __actions__[i].text())
                 w.tabBar().setTabData(r, i)
                 w.tabBar().setTabToolTip(r, __actions__[i].text())
 
@@ -698,7 +705,6 @@ def prefDialog():
         for index in range(selector.count()):
             if selector.item(index).checkState() != QtCore.Qt.Checked:
                 disabled.append(selector.item(index).data(32))
-        #__parameters__.SetString("Unchecked", ",".join(disabled))
         __groupedWB__.update({__strDisabled__: disabled})
         saveMyWB()
 
@@ -718,7 +724,6 @@ def prefDialog():
                 position.append(selector.item(index).data(32))
             __groupedWB__.update({__strAll__: position})
             saveMyWB()
-            #__parameters__.SetString("Position", ",".join(position))
             onItemChanged()
 
     def onDown():
@@ -735,7 +740,6 @@ def prefDialog():
                 position.append(selector.item(index).data(32))
             __groupedWB__.update({__strAll__: position})
             saveMyWB()
-            #__parameters__.SetString("Position", ",".join(position))
             onItemChanged()
 
     def onOpenFile():
@@ -811,15 +815,6 @@ def prefDialog():
                     __parameters__.SetString("Style", i.objectName())
             onWorkbenchActivated()
 
-    """
-    def onOrientationPanel(r):
-        #Set TabBar orientation.
-        if r:
-            for i in orientationPanel.findChildren(QtWidgets.QRadioButton):
-                if i.isChecked():
-                    __parameters__.SetString("Orientation", i.objectName())
-            onWorkbenchActivated()
-    """
 
     def onG6(r):
         """Set pref button."""
