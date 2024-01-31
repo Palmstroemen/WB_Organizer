@@ -20,7 +20,7 @@
 """TabBar widget for FreeCAD."""
 __pathToolbar__ = "User parameter:BaseApp/Workbench/Global/Toolbar"
 __pathTabbar__  = "User parameter:BaseApp/Workbench/Global/Toolbar/Tabs"
-__parameters__  = FreeCAD.ParamGet("User parameter:BaseApp/TabBar")
+__parameters__  = FreeCAD.ParamGet("User parameter:BaseApp/WB_Organizer")
 print("WBO Start")
 
 if __parameters__.GetBool("Enabled", 1):

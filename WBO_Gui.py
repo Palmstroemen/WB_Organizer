@@ -37,7 +37,7 @@ __pathInstruct__  = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\Res
 __pathIcons__     = os.path.dirname(__file__) + "\\Resources\\icons\\"
 __pathToolbar__   = "User parameter:BaseApp/Workbench/Global/Toolbar"
 
-__parameters__    = App.ParamGet("User parameter:BaseApp/TabBar")
+__parameters__    = App.ParamGet("User parameter:BaseApp/WB_Organizer")
 __groupedWB__     = {}
 __aliasNames__    = {}
 
@@ -107,6 +107,7 @@ def openMyWB():
         __parameters__.SetString("floatingWidth", "1000")
         __parameters__.SetString("PrefButton", "Dropdown")
         __parameters__.SetString("Style", "IconText")
+        __parameters__.SetString("selectedWB", __strAll__)
 
     # Schreiben der formatierten Daten in eine Datei
     if not os.path.exists(__pathGroupFile__):
@@ -171,7 +172,9 @@ def openMyWB():
                 # Handle the error accordingly	
 
     global __selectedGroup__            
-    __selectedGroup__ = __strAll__      # the currently selected Group
+    __selectedGroup__ = __parameters__.GetString("selectedWB", __strAll__)      # the currently selected Group
+    #__selectedGroup__ = __strAll__
+    print("SelectedGroup:",__selectedGroup__)
     return __groupedWB__
 
 __groupedWB__  = openMyWB()
@@ -323,6 +326,8 @@ def onGroupSelected(group):
 
     ToolBarWidget = tabs(group)
     onOrientationChanged(ToolBarWidget)
+    __parameters__.SetString("selectedWB", __selectedGroup__)
+    print("SelectedGroup:", __selectedGroup__)
 
 
 def tabs(groupName = __strAll__):
