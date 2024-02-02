@@ -19,6 +19,17 @@ WBO further allows to **rename workbenches** whether to translate or to give it 
 
 Of course, you also find an 'All'-workbenches group to access workbenches the traditional way.
 
+## Installation
+As long as the WBO is not available in the AddOn-Manager, you need to install it manually.
+1. Download the code from here to any place on your computer.
+2. Extract the zip-file, if you have downloaded it as a zip-file.
+3. RENAME the folder from "WB_Organizer_main" to "WB_Organizer". (I don't know why GitHub adds this "_main".
+4. move or copy the extracted folder inside your FreeCAD Mod folder.
+Linux:   `/home/user/.FreeCAD/Mod/ShortCuts/InitGui.py`
+macOS:   `/Users/user_name/Library/Preferences/FreeCAD/Mod/ShortCuts/InitGui.py`
+Windows: `C:\Users\user_name\AppData\Roaming\FreeCAD\Mod\ShortCuts\InitGui.py`
+On the next starup, FreeCAD will find your new AddOn.
+
 ## Preferences dialog
 A preferences dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
 
