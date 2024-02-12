@@ -11,6 +11,7 @@
         "SMWorkbench",
         "SurfaceWorkbench",
         "Silk",
+        "WorkFeatureWorkbench",
         "Design456",
         ""
     ],

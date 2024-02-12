@@ -1,0 +1,5 @@
+Wünsche:
+
+den Gruppendropdown selector auch verbergen und nur in Preferences anzeigen. 
+Für Menschen, die eigentlich nur ein paar wenige WB sehen wollen.
+

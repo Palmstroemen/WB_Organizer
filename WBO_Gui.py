@@ -317,8 +317,6 @@ def onGroupSelected(group):
     global __selectedGroup__
     __selectedGroup__ = group
 
-    btn.setText(group)
-
     for i in tb.findChildren(QtWidgets.QTabWidget, "TabBar"):
         i.deleteLater()
     for i in tb.findChildren(QtWidgets.QWidgetAction):
@@ -352,10 +350,14 @@ def tabs(groupName = __strAll__):
     btn.setFlat(True)
     btn.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_icon.svg"))
     btn.setStyleSheet("text-align: left;")
-    if groupName == __strAll__:
-        btn.setText("Select Group:")
+    showName = __parameters__.GetString("GroupStyle", "showName")
+    if showName == "showName":
+        if groupName == __strAll__:
+            btn.setText("Select Group:")
+        else:
+            btn.setText(groupName)
     else:
-        btn.setText(groupName)
+        btn.setText("")
     menu = QtWidgets.QMenu(btn)
     btn.setMenu(menu)
 
@@ -572,7 +574,6 @@ def prefDialog():
     btnTestRename.setToolTip("Check the rename-file")
     btnTestRename.setText("Test rename-file")
 
-    label = QtWidgets.QLabel("Length of Workbench Organizer when free floating:")
     explication = QtWidgets.QLabel("<i>Confirm your data entry with [Shift] + [Return]<br>to keep the dialog window open.</i>")
     explication.setStyleSheet("color: lightgrey")
 
@@ -596,10 +597,35 @@ def prefDialog():
     groupsButtons.addWidget(txtResult)
     groupsButtons.addStretch()
     groupsPanel.setLayout(groupsButtons)
+
+    #----------------------- Right Area ----------------------------
+    showGRPpanelLayout = QtWidgets.QHBoxLayout()
+    showGRPpanel = QtWidgets.QGroupBox("Show Groupnames in title:")
+    showGRPpanel.setLayout(showGRPpanelLayout)
+    r6 = QtWidgets.QRadioButton("show name", showGRPpanel)
+    r6.setObjectName("showName")
+    r6.setToolTip("Show the selected group name in the title")
+    r7 = QtWidgets.QRadioButton("hide name", showGRPpanel)
+    r7.setObjectName("hideName")
+    r7.setToolTip("Show just the icon to reduce button size")
+    showGRPpanelLayout.addWidget(r6)
+    showGRPpanelLayout.addWidget(r7)
     #--------------------------------------------------------------
-    l0 = QtWidgets.QHBoxLayout()
-    stylePanel = QtWidgets.QGroupBox("Style:")
-    stylePanel.setLayout(l0)
+    showWBpanelLayout = QtWidgets.QVBoxLayout()
+    showWBpanel = QtWidgets.QGroupBox("Show Workbenches as Tabs or as Dropdown:")
+    showWBpanel.setLayout(showWBpanelLayout)
+    r8 = QtWidgets.QRadioButton("Tabs", showWBpanel)
+    r8.setObjectName("Tabs")
+    r8.setToolTip("Show the workbenches in a tabbar")
+    r9 = QtWidgets.QRadioButton("Dropdown", showWBpanel)
+    r9.setObjectName("Dropdown")
+    r9.setToolTip("Show the workbenches in a dropdownlist")
+    showWBpanelLayout.addWidget(r9)
+    showWBpanelLayout.addWidget(r8)
+    #--------------------------------------------------------------
+    stylePanelLayout = QtWidgets.QHBoxLayout()
+    stylePanel = QtWidgets.QGroupBox("Tabs-Style:")
+    stylePanel.setLayout(stylePanelLayout)
     r0 = QtWidgets.QRadioButton("Icon", stylePanel)
     r0.setObjectName("Icon")
     r0.setToolTip("Show just icon in tabbar.")
@@ -609,35 +635,15 @@ def prefDialog():
     r2 = QtWidgets.QRadioButton("Icon and text", stylePanel)
     r2.setObjectName("IconText")
     r2.setToolTip("Show icon and text in tabbar")
-    l0.addWidget(r0)
-    l0.addWidget(r1)
-    l0.addWidget(r2)
-    #-----------------------
-    """
-    l1 = QtWidgets.QVBoxLayout()
-    orientationPanel = QtWidgets.QGroupBox("Tab orientation:")
-    orientationPanel.setLayout(l1)
-    r3 = QtWidgets.QRadioButton("Auto", orientationPanel)
-    r3.setObjectName("Auto")
-    r3.setToolTip("Set based on the orientation")
-    r4 = QtWidgets.QRadioButton("Top", orientationPanel)
-    r4.setObjectName("North")
-    r4.setToolTip("Tabs at top")
-    r5 = QtWidgets.QRadioButton("Bottom", orientationPanel)
-    r5.setObjectName("South")
-    r5.setToolTip("Tabs at bottom")
-    r6 = QtWidgets.QRadioButton("Left", orientationPanel)
-    r6.setObjectName("West")
-    r6.setToolTip("Tabs at left")
-    r7 = QtWidgets.QRadioButton("Right", orientationPanel)
-    r7.setObjectName("East")
-    r7.setToolTip("Tabs at right")
-    l1.addWidget(r3)
-    l1.addWidget(r4)
-    l1.addWidget(r5)
-    l1.addWidget(r6)
-    l1.addWidget(r7)
-    """
+    stylePanelLayout.addWidget(r0)
+    stylePanelLayout.addWidget(r1)
+    stylePanelLayout.addWidget(r2)
+
+    styleLengthLayout = QtWidgets.QVBoxLayout()
+    styleLengthPanel = QtWidgets.QGroupBox("Lenght of Workbench Organizer when free floating:")
+    styleLengthPanel.setLayout(styleLengthLayout)
+    styleLengthLayout.addWidget(lineEdit)
+    styleLengthLayout.addWidget(explication)
     #-----------------------
     buttonsPanel = QtWidgets.QHBoxLayout()    # die untere Leiste mit den Up/down und Close-Buttons
     buttonsPanel.addWidget(btnUp)
@@ -648,24 +654,10 @@ def prefDialog():
     l3 = QtWidgets.QHBoxLayout()
     l3.addStretch()
     l4 = QtWidgets.QVBoxLayout()
+    l4.addWidget(showGRPpanel)
+    l4.addWidget(showWBpanel)
     l4.addWidget(stylePanel)
-    #l4.addWidget(g1)
-    #----------------------- Right Area
-    showWBPanel = QtWidgets.QVBoxLayout()
-    g6 = QtWidgets.QGroupBox("Show Workbenches as Tabs or as Dropdown:")
-    g6.setLayout(showWBPanel)
-    r8 = QtWidgets.QRadioButton("Tabs", g6)
-    r8.setObjectName("Tabs")
-    r8.setToolTip("Show the workbenches in a tabbar")
-    r9 = QtWidgets.QRadioButton("Dropdown", g6)
-    r9.setObjectName("Dropdown")
-    r9.setToolTip("Show the workbenches in a dropdownlist")
-    showWBPanel.addWidget(r9)
-    showWBPanel.addWidget(r8)
-    showWBPanel.addWidget(label)
-    showWBPanel.addWidget(lineEdit)
-    showWBPanel.addWidget(explication)
-    l4.addWidget(g6)
+    l4.addWidget(styleLengthPanel)
     l4.addStretch()
     l4.insertLayout(0, l3)
     #--------------------------------------
@@ -812,6 +804,22 @@ def prefDialog():
         onWorkbenchActivated()
 
 
+    def ongroupPanel(r):
+        """Set Groups button style."""
+        if r:
+            for i in showGRPpanel.findChildren(QtWidgets.QRadioButton):
+                if i.isChecked():
+                    __parameters__.SetString("GroupStyle", i.objectName())
+            onWorkbenchActivated()
+
+    def onshowWBpanel(r):
+        """Set pref button."""
+        if r:
+            for i in showWBpanel.findChildren(QtWidgets.QRadioButton):
+                if i.isChecked():
+                    __parameters__.SetString("PrefButton", i.objectName())
+            onWorkbenchActivated()
+
     def onstylePanel(r):
         """Set TabBar style."""
         if r:
@@ -820,14 +828,6 @@ def prefDialog():
                     __parameters__.SetString("Style", i.objectName())
             onWorkbenchActivated()
 
-
-    def onG6(r):
-        """Set pref button."""
-        if r:
-            for i in g6.findChildren(QtWidgets.QRadioButton):
-                if i.isChecked():
-                    __parameters__.SetString("PrefButton", i.objectName())
-            onWorkbenchActivated()
 
     """ 
     # This is a trial to prevent the 'Return' signal escaping the lineEdit-Widget and
@@ -863,6 +863,12 @@ def prefDialog():
                 item.setData(50, "Unchecked")
 
     # set the radio buttons to the stored values
+    groupStyle = __parameters__.GetString("GroupStyle", "showName")
+    if groupStyle == "showName":
+        r6.setChecked(True)
+    else:
+        r7.setChecked(True)
+
     style = __parameters__.GetString("Style")
     if style == "Text":
         r1.setChecked(True)
@@ -871,37 +877,23 @@ def prefDialog():
     else:
         r0.setChecked(True)
 
-    """
-    orientation = __parameters__.GetString("Orientation")
-    if orientation == "North":
-        r4.setChecked(True)
-    elif orientation == "South":
-        r5.setChecked(True)
-    elif orientation == "West":
-        r6.setChecked(True)
-    elif orientation == "East":
-        r7.setChecked(True)
-    else:
-        r3.setChecked(True)
-    """    
 
     prefbutton = __parameters__.GetString("PrefButton", "Tabs")
     if prefbutton == "Tabs":
         r8.setChecked(True)
     else:
         r9.setChecked(True)
+
+    r6.toggled.connect(ongroupPanel)
+    r7.toggled.connect(ongroupPanel)
+
+    r8.toggled.connect(onshowWBpanel)
+    r9.toggled.connect(onshowWBpanel)
+
     r0.toggled.connect(onstylePanel)
     r1.toggled.connect(onstylePanel)
     r2.toggled.connect(onstylePanel)
-    """
-    #r3.toggled.connect(onOrientationPanel)
-    #r4.toggled.connect(onOrientationPanel)
-    #r5.toggled.connect(onOrientationPanel)
-    #r6.toggled.connect(onOrientationPanel)
-    #r7.toggled.connect(onOrientationPanel)
-    """
-    r8.toggled.connect(onG6)
-    r9.toggled.connect(onG6)
+
     btnUp.clicked.connect(onUp)
     btnDown.clicked.connect(onDown)
     selector.itemChanged.connect(onItemChanged)
