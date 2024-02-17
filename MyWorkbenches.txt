@@ -70,6 +70,7 @@
         ""
     ],
     "WBO All": [
+        "StartWorkbench",
         "AnimationFreeCAD",
         "ArchWorkbench",
         "DraftWorkbench",
@@ -85,7 +86,6 @@
         "SketcherWorkbench",
         "SpreadsheetWorkbench",
         "RobotWorkbench",
-        "StartWorkbench",
         "SurfaceWorkbench",
         "TechDrawWorkbench",
         "TestWorkbench",
@@ -102,7 +102,6 @@
         "PovRayRendering",
         "SMWorkbench",
         "Silk",
-        "NoneWorkbench",
         "CfdOFWorkbench",
         "dodo",
         "ExplodedAssembly",
@@ -113,9 +112,12 @@
         "estimateWB",
         "Assembly3Workbench",
         "CADENAS3DfinditWorkbench",
-        ""
+        "OpticsWorkbench",
+        "PCB"
     ],
-    "WBO New": [""],
+    "WBO New": [
+        "PCB"
+    ],
     "WBO Lost": [
         "WebToolsWorkbench",
         "WorkFeatureWorkbench",
@@ -127,7 +129,6 @@
         ""
     ],
     "WBO Disabled": [
-        "CfdOFWorkbench",
-        ""
+        "CfdOFWorkbench"
     ]
 }

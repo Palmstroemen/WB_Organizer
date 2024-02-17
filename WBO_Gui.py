@@ -24,6 +24,7 @@ import FreeCADGui as Gui
 import FreeCAD as App
 from   PySide2 import QtGui, QtWidgets, QtCore
 import os, json
+import webbrowser
 
 __strAll__        = "WBO All"
 __strDrop__       = "WBO In Groups Dropdown"
@@ -322,13 +323,13 @@ def onGroupSelected(group):
     for i in tb.findChildren(QtWidgets.QWidgetAction):
         i.deleteLater()
 
-    ToolBarWidget = tabs(group)
+    ToolBarWidget = WB_organizer(group)
     onOrientationChanged(ToolBarWidget)
     __parameters__.SetString("selectedWB", __selectedGroup__)
     print("SelectedGroup:", __selectedGroup__)
 
 
-def tabs(groupName = __strAll__):
+def WB_organizer(groupName = __strAll__):
     """Tabs widget."""
     # The user can decide in the Preferences if a WB shall be shown ...
     # ... in the TabBar as Tab (checked)
@@ -392,10 +393,17 @@ def tabs(groupName = __strAll__):
     menu.addSeparator()
 
     pref = QtWidgets.QAction(menu)
-    pref.setText("Preferences")
+    pref.setText("Preferences ...")
     pref.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Prefs.svg"))
     pref.triggered.connect(onPreferences)
     menu.addAction(pref)
+
+    help = QtWidgets.QAction(menu)
+    help.setText("Help ...")
+    help.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Help.svg"))
+    help.triggered.connect(onHelp)
+    menu.addAction(help)
+
 
     menu_width = menu.sizeHint().width()
     menu.setFixedWidth(menu_width + 20)
@@ -485,7 +493,7 @@ def onWorkbenchActivated():
     for i in tb.findChildren(QtWidgets.QWidgetAction):
         i.deleteLater()
     global __selectedGroup__
-    ToolBarWidget = tabs(__selectedGroup__)
+    ToolBarWidget = WB_organizer(__selectedGroup__)
     onOrientationChanged(ToolBarWidget)
 
 
@@ -523,7 +531,7 @@ def prefDialog():
     wbActions()
     dialog = QtWidgets.QDialog(__mainWindow__)
     dialog.setModal(True)
-    dialog.resize(800, 450)
+    dialog.resize(700, 650)
     dialog.setWindowTitle("WorkbenchOrganizer preferences")
     layout = QtWidgets.QVBoxLayout()
     dialog.setLayout(layout)
@@ -534,6 +542,10 @@ def prefDialog():
     btnClose = QtWidgets.QPushButton("Close", dialog)
     btnClose.setToolTip("Close the preferences dialog")
     btnClose.setDefault(True)
+
+    btnHelp = QtWidgets.QPushButton(dialog)
+    btnHelp.setToolTip("Get online help to the Workbench-Organizer")
+    btnHelp.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Help.svg"))
 
     btnUp = QtWidgets.QPushButton(dialog)
     btnUp.setToolTip("Move selected item up")
@@ -604,6 +616,7 @@ def prefDialog():
     showGRPpanel.setLayout(showGRPpanelLayout)
     r6 = QtWidgets.QRadioButton("show name", showGRPpanel)
     r6.setObjectName("showName")
+    #r6.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_without_text.png"))
     r6.setToolTip("Show the selected group name in the title")
     r7 = QtWidgets.QRadioButton("hide name", showGRPpanel)
     r7.setObjectName("hideName")
@@ -646,6 +659,7 @@ def prefDialog():
     styleLengthLayout.addWidget(explication)
     #-----------------------
     buttonsPanel = QtWidgets.QHBoxLayout()    # die untere Leiste mit den Up/down und Close-Buttons
+    buttonsPanel.addWidget(btnHelp)
     buttonsPanel.addWidget(btnUp)
     buttonsPanel.addWidget(btnDown)
     buttonsPanel.addStretch(1)
@@ -894,6 +908,7 @@ def prefDialog():
     r1.toggled.connect(onstylePanel)
     r2.toggled.connect(onstylePanel)
 
+    btnHelp.clicked.connect(onHelp)
     btnUp.clicked.connect(onUp)
     btnDown.clicked.connect(onDown)
     selector.itemChanged.connect(onItemChanged)
@@ -914,6 +929,12 @@ def onPreferences():
     """Open the preferences dialog."""
     dialog = prefDialog()
     dialog.show()
+
+
+def onHelp():
+    """Open a help page."""
+    webbrowser.open("https://github.com/Palmstroemen/WB_Organizer/wiki")
+
 
 #==================================================================================================================================
 
