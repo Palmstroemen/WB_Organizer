@@ -101,11 +101,11 @@ To remove your new name, you can simply replace your name with an empty ""-strin
 In general, you can name your groups as you like.
 
 There are 5 special groups used by the WBO. Please do NOT RENAME THESE.
-*) WBO_Drop     (workbenches that shall be inside the groups' drop-down list)
-*) WBO_All      (all currently recognized and activated workbenches)
-*) WBO_New      (since last actualization newly registered workbenches)
-*) WBO_Lost     (workbenches you have deactivated or uninstalled)
-*) WBO_Disabled (workbenches you have disabled WITHIN WBO!)
+* WBO_Drop     (workbenches that shall be inside the groups' drop-down list)
+* WBO_All      (all currently recognized and activated workbenches)
+* WBO_New      (since last actualization newly registered workbenches)
+* WBO_Lost     (workbenches you have deactivated or uninstalled)
+* WBO_Disabled (workbenches you have disabled WITHIN WBO!)
 
 However, the only visible group of these 5 groups is the WBO_All group.
 You can assign this group an alias name or translation into your language by
