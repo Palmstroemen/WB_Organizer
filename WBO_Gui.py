@@ -330,12 +330,12 @@ def onGroupSelected(group):
 
 
 def WB_organizer(groupName = __strAll__):
-    """Tabs widget."""
-    # The user can decide in the Preferences if a WB shall be shown ...
-    # ... in the TabBar as Tab (checked)
-    # ... as Dropdown-Entry at the left Side of the TabBar (double not checked)
-    # ... not (once not checked)
-
+    """This is the WBO widget.
+    Users can decide in the Preferences if a WB shall be shown ...
+    ... in the TabBar as Tab (checked)
+    ... as Dropdown-Entry at the left Side of the TabBar (double not checked)
+    .. not (once not checked)
+    """
     def onGroupSelectedAction(group):
         return lambda checked=False, group=group: onGroupSelected(group)
 
@@ -408,7 +408,7 @@ def WB_organizer(groupName = __strAll__):
     menu_width = menu.sizeHint().width()
     menu.setFixedWidth(menu_width + 20)
 
-
+    # Now for the workbench-selector (dropdown or tabs)
     prefbutton  = __parameters__.GetString("PrefButton", "Dropdown")
     if prefbutton == 'Dropdown':
         # Dropdown ======================================================================
@@ -427,6 +427,11 @@ def WB_organizer(groupName = __strAll__):
         for i in groupWB:                         # Add the inGroupsDD WB
             if i in __actions__:
                 menu.addAction(__actions__[i])
+            if i.startswith('---'):  # Check if the entry starts with "--"
+                print("Separator added")
+                separator_label = i[3:]  # Remove the leading "--" to get the label
+                separator_action = menu.addSeparator()
+                separator_action.setText(separator_label)
 
         menu2_width = menu.sizeHint().width()
         menu.setFixedWidth(menu2_width + 10)
@@ -547,6 +552,10 @@ def prefDialog():
     btnHelp.setToolTip("Get online help to the Workbench-Organizer")
     btnHelp.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Help.svg"))
 
+    btnAdd = QtWidgets.QPushButton(dialog)
+    btnAdd.setToolTip("Start the AddOn-Manager to add further Workbenches")
+    btnAdd.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_AddWorkbench.svg"))
+
     btnUp = QtWidgets.QPushButton(dialog)
     btnUp.setToolTip("Move selected item up")
     btnUp.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_MoveUp"))
@@ -660,6 +669,7 @@ def prefDialog():
     #-----------------------
     buttonsPanel = QtWidgets.QHBoxLayout()    # die untere Leiste mit den Up/down und Close-Buttons
     buttonsPanel.addWidget(btnHelp)
+    buttonsPanel.addWidget(btnAdd)
     buttonsPanel.addWidget(btnUp)
     buttonsPanel.addWidget(btnDown)
     buttonsPanel.addStretch(1)
@@ -909,6 +919,7 @@ def prefDialog():
     r2.toggled.connect(onstylePanel)
 
     btnHelp.clicked.connect(onHelp)
+    btnAdd.clicked.connect(onAdd)
     btnUp.clicked.connect(onUp)
     btnDown.clicked.connect(onDown)
     selector.itemChanged.connect(onItemChanged)
@@ -935,6 +946,9 @@ def onHelp():
     """Open a help page."""
     webbrowser.open("https://github.com/Palmstroemen/WB_Organizer/wiki")
 
+
+def onAdd():
+    Gui.runCommand('Std_AddonMgr',0)
 
 #==================================================================================================================================
 
