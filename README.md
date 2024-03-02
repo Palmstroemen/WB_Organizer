@@ -5,7 +5,7 @@ The aim of the workbench organizer (WBO) is to organize the long list of workben
 
 ![](./Resources/videos/WBO_dropdown.gif)
 
-The WBO provides **workbench groups** with an **additional selector** to first select a group of workbenches which then allows to select a workbench from a (reduced) group of workbenches with the aim to make it easier to find your workbenches.
+The WBO provides **workbench groups** with an **additional selector** to first select a group of workbenches which then allows to select a workbench from a (reduced) group of workbenches with the aim of making it easier to find your workbenches.
 
 It also allows to present the workbenches in tabs or in a dropdown list.
 
@@ -13,7 +13,7 @@ It also allows to present the workbenches in tabs or in a dropdown list.
 
 It allows to put **one workbench in multiple groups**. So i.e. the Spreadsheet-Workbench might appear in multiple groups.
 
-It even allows to put workbenches **into the group-selector dropdown**. This might be useful for workbenches like Spreadsheet that you might want to put in many groups maybe to save space in your TabBar.
+It even allows you to put workbenches **into the group-selector dropdown**. This might be useful for workbenches like Spreadsheet that you might want to put in many groups maybe to save space in your TabBar.
 
 WBO further allows to **rename workbenches** whether to translate or to give it a - for you - more meaningful name. *Who remembers that a workbench like 'Dodo' is meant for constructing pipelines and frameworks after a year not using FreeCAD? In the videos you can see, that we have renamed several workbenches in German language. Like 'Spreadsheet' --> 'Tabellen'*
 
@@ -22,16 +22,16 @@ Of course, you also find an 'All'-workbenches group to access workbenches the tr
 ## Installation
 As long as the WBO is not available in the AddOn-Manager, you need to install it manually.
 1. Download the code from here to any place on your computer.
-2. Extract the zip-file, if you have downloaded it as a zip-file.
+2. Extract the zip file, if you have downloaded it as a zip file.
 3. RENAME the folder from "WB_Organizer_main" to "WB_Organizer". (I don't know why GitHub adds this "_main".
 4. move or copy the extracted folder inside your FreeCAD Mod folder.
 Linux:   `/home/user/.FreeCAD/Mod/ShortCuts/InitGui.py`
 macOS:   `/Users/user_name/Library/Preferences/FreeCAD/Mod/ShortCuts/InitGui.py`
 Windows: `C:\Users\user_name\AppData\Roaming\FreeCAD\Mod\ShortCuts\InitGui.py`
-On the next starup, FreeCAD will find your new AddOn.
+On the next startup, FreeCAD will find your new AddOn.
 
 ## Preferences dialog
-A preferences dialog can be accessed from within the groups-dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
+A preferences dialog can be accessed from within the groups dropdown or under __menu -> Accessories -> WorkbenchOrganizer__.
 
 ![](./Resources/images/WBO_preferences.png)
 
@@ -40,10 +40,10 @@ For an introduction to how to create and modify your workbenches, see [instructi
 
 _In case our WorkbenchOrganizer finds some fans, we'll continue to improve it. For the moment, this is our MVP (minimal valuable product)._
 
-**I especially like to kudos to TRIPLUS who has provided several very exiting tools like the 'Glass' AddOn, the 'PieMenu' AddOn or the 'TabBar' Addon which this WBO is based on.** *The 'TabBar' AddOn has been kind of abandonned since 2017 or so. So I hijacked it and took it as starting point for the development of WBO which saved me a lot of time.*
+**I especially like to kudos to TRIPLUS who has provided several very exciting tools like the 'Glass' AddOn, the 'PieMenu' AddOn, and the 'TabBar' Addon which this WBO is based on.** *The 'TabBar' AddOn has been kind of abandoned since 2017 or so. So I hijacked it and took it as a starting point for the development of WBO which saved me a lot of time.*
 
 
-## Tips how to use the Workbench-Organizer right now
+## Tips on how to use the Workbench Organizer right now
 The WBO is a workbench by itself and thus would live inside the workbenches at the top of your window.
 The problem with this is, that workbenches are somehow reordered on each change of a workbench. This leads to your WBO jumping around.
 
@@ -53,14 +53,14 @@ So your WBO might all of a sudden collapse to a short widget forcing you to rear
 That's NOT, what you want.
 
 ### BUT ... there's a workaround for the moment!
-UNDOCK your WBO from the toolbar and make it free floating! You could attach it to the top, the bottom or even to the sides of your main window. But that's NOT what you go for! 
-Move your WBO right at the very top into the header line of FreeCAD, right aside the FreeCAD-LOGO at the top left of your window. So your WBO will sit above your menu.
+UNDOCK your WBO from the toolbar and make it free-floating! You could attach it to the top, the bottom or even to the sides of your main window. But that's NOT what you go for! 
+Move your WBO right at the very top into the header line of FreeCAD, right aside from the FreeCAD-LOGO at the top left of your window. So your WBO will sit above your menu.
 Like so:
 
 ![](./Resources/images/WBO_top.png)
 
-Inside the 'preferences' dialog of the WBO on the right bottom side, you'll find a field to enter the **'Length of Workbench Organizer when free floating'**. This allows you to adopt the lenght of your TabBar to your screen size. 
-Confirm your changes with [Shift] + [Return] for not leaving the whole dialog on [Return] and seeing an immediate result! 
+Inside the 'preferences' dialog of the WBO on the right bottom side, you'll find a field to enter the **'Length of Workbench Organizer when free floating'**. This allows you to adapt the length of your TabBar to your screen size. 
+Confirm your changes with [Shift] + [Return] so as not to leave the whole dialog on [Return] and see an immediate result! 
 
 As we can't hide the standard workbench selector we want to put it a little bit 'out of our sight' to the top right.
 Go to the configuration panel (menu -> edit -> configurations (or so?))
@@ -69,19 +69,19 @@ Go to the configuration panel (menu -> edit -> configurations (or so?))
 
 1. Select the Workbench dialog (the 3rd from the top), ...
 2. scroll down to the very bottom of the list, and ...
-3. select inside the dropdown to place the selector widget to the **top right corner** of the window.
+3. select inside the dropdown to place the selector widget in the **top right corner** of the window.
 
 ![](./Resources/images/WBO_config.png)
 
-Now after a restart your old Workbench selector will sit in the top right corner like so:
+Now after a restart, your old Workbench selector will sit in the top right corner like so:
 
 ![](./Resources/images/WBO_Start.png)
 
 There it is still available but won't disturb or confuse you.
 
-Finally you might consider to remove some useless buttons from the workbenches area like the file load and save buttons, the undo and redo buttons to save you some more screenspace. *(Won't you use [Ctrl]+[Z] for undo and [Ctrl]+[Y] for redo? So why waste your screen space with these buttons?)*
+Finally, you might consider removing some useless buttons from the workbenches area like the file load and save buttons, and the undo and redo buttons to save you some more screenspace. *(Won't you use [Ctrl]+[Z] for undo and [Ctrl]+[Y] for redo? So why waste your screen space with these buttons?)*
 
-Now you can try to **rearrange all your workbench buttons** in a way that they are not shuffled around on each workbench change. See how the upper left part of our workbenches remain static on the change of workbenches.
+Now you can try to **rearrange all your workbench buttons** in a way that they are not shuffled around on each workbench change. See how the upper left part of our workbenches remains static on the change of workbenches.
 
 ![](./Resources/videos/WBO_in_action.gif)
 
@@ -93,21 +93,21 @@ You can rename your workbenches to give them a more meaningful name or to transl
 
 As of now, you need to edit the file 'MyWorkbenchesRenaming.txt' manually.
 You can easily open and check this file from within the preferences dialog.
-To add a translation to this list, the best way to do it is, to copy the workbench name from the 'WBO All' list of the other 'MyWorkbenches.txt' file to avoid mispellings. Then paste it to the list and insert ': "yourNewWorbenchName" before the ',' comma that must end each line.
+To add a translation to this list, the best way to do it is, to copy the workbench name from the 'WBO All' list of the other 'MyWorkbenches.txt' file to avoid misspellings. Then paste it to the list and insert ': "yourNewWorbenchName" before the ',' comma that must end each line.
 
-To remove your new name, you can simply replace your name by an empty ""-string or you can delet the whole line from the list.
+To remove your new name, you can simply replace your name with an empty ""-string or you can delete the whole line from the list.
 
 ## Renaming groups
-In general you can name your groups as you like.
+In general, you can name your groups as you like.
 
 There are 5 special groups used by the WBO. Please do NOT RENAME THESE.
-*) WBO_Drop     (workbenches that shall be iside the groups dropdownlist)
+*) WBO_Drop     (workbenches that shall be inside the groups' drop-down list)
 *) WBO_All      (all currently recognized and activated workbenches)
 *) WBO_New      (since last actualization newly registered workbenches)
-*) WBO_Lost     (workbenches you have deactivated or deinstalled)
+*) WBO_Lost     (workbenches you have deactivated or uninstalled)
 *) WBO_Disabled (workbenches you have disabled WITHIN WBO!)
 
-However, the only visible group of these 5 grous is the WBO_All group.
-You can assign this group an aliasName or translation into your language by
+However, the only visible group of these 5 groups is the WBO_All group.
+You can assign this group an alias name or translation into your language by
 editing the MyWorkbenchesRenaming.txt file. There's an entry for that.
 
