@@ -14,7 +14,7 @@ Allows to show the workbench selector as tabbar.</description>
 
   <maintainer email="19696982+Palmstroemen@users.noreply.github.com">Palmstroemen</maintainer>
 
-  <license file="License/lgpl-2.1.txt">LGPLv2.1</license>
+  <license file="License/lgpl-2.1.txt">LGPL-2.1-or-later</license>
 
   <pythonmin>3.6.0</pythonmin>
 
@@ -24,7 +24,7 @@ Allows to show the workbench selector as tabbar.</description>
 
   <url type="bugtracker">https://github.com/Palmstroemen/WB_Organizer/issues</url>
 
-  <url type="readme">https://github.com/Palmstroemen/WB_Organizer.git/raw/main/README.md</url>
+  <url type="readme">https://github.com/Palmstroemen/WB_Organizer/raw/main/README.md</url>
 
   <url type="documentation">https://github.com/Palmstroemen/WB_Organizer/wiki</url>
 
