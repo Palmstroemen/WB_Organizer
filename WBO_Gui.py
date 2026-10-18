@@ -23,14 +23,15 @@
 import FreeCADGui as Gui
 import FreeCAD as App
 from   PySide2 import QtGui, QtWidgets, QtCore
-import os, json
+import os
 import webbrowser
+import wbo_core as core
 
-__strAll__        = "WBO All"
-__strDrop__       = "WBO In Groups Dropdown"
-__strNew__        = "WBO New"
-__strLost__       = "WBO Lost"
-__strDisabled__   = "WBO Disabled"
+__strAll__        = core.STR_ALL
+__strDrop__       = core.STR_DROP
+__strNew__        = core.STR_NEW
+__strLost__       = core.STR_LOST
+__strDisabled__   = core.STR_DISABLED
 
 __pathGroupFile__ = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "MyWorkbenches.txt")
 __pathAliasFile__ = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "MyWorkbenchesRenaming.txt")
@@ -89,20 +90,12 @@ class TabWidget(QtWidgets.QTabWidget):
 #--------------------------------------------------------------------
 
 def saveMyWB():
-        # Formatieren der Daten mit Einrückung
-    
-    formatted_data = json.dumps(__groupedWB__, indent=4)
-    with open(__pathGroupFile__, 'w') as f:
-        f.write(formatted_data)
+    core.save_json(__pathGroupFile__, __groupedWB__)
 
 
 def openMyWB():
-    WB = Gui.listWorkbenches()
-    justWB = list(WB)
-    justWB.append("")
-    newWB     = []
-    global __groupedWB__
-    global __aliasNames__, __strAll__, __strDrop__, __strNew__, __strLost__, __strDisabled__
+    installed = list(Gui.listWorkbenches())
+    global __groupedWB__, __aliasNames__
 
     if not __parameters__.GetString("PrefButton"):
         __parameters__.SetString("floatingWidth", "1000")
@@ -110,71 +103,33 @@ def openMyWB():
         __parameters__.SetString("Style", "IconText")
         __parameters__.SetString("selectedWB", __strAll__)
 
-    # Schreiben der formatierten Daten in eine Datei
     if not os.path.exists(__pathGroupFile__):
         print("Config-file not found: generating new template.")
-        __groupedWB__ = {__strDrop__: [""], __strAll__: justWB, __strNew__: justWB, __strLost__: [""], __strDisabled__: [""]}
+        __groupedWB__ = core.default_groups(installed)
         saveMyWB()
-	
-    else:	# a file already exists. Check for new and lost Workbenches
-        with open(__pathGroupFile__, 'r') as f:
-            try: 
-                __groupedWB__ = json.load(f)
-                loadedAll     = __groupedWB__.get(__strAll__)
-                loadedAll.append("")    # ["a","","b","c",""]
-                loadedAll.remove("")    # ["a","b","c",""]
-                __groupedWB__.update({__strNew__: []})
-                lostWB    = [wb for wb in loadedAll]
-                for wb in WB:
-                    if wb in loadedAll:
-                        lostWB.remove(wb)
-                    else:
-                        newWB.append(wb)
-                        loadedAll.append(wb)
-        
-                if lostWB:
-                    lostWB.append("")
-                    lostWB.remove("")
-                    __groupedWB__.update({__strLost__: lostWB})
-        
-                if newWB:
-                    newWB.append("")
-                    newWB.remove("")
-                    __groupedWB__.update({__strNew__: newWB})
-            except json.JSONDecodeError as e:
-                print(f"Error decoding JSON: {e}")
-                __groupedWB__ = {__strDrop__: [""], __strAll__: justWB, __strNew__: justWB, __strLost__: [""], __strDisabled__: [""]}
-            except Exception as e:
-                print(f"Error: {e}")
-                __groupedWB__ = {__strDrop__: [""], __strAll__: justWB, __strNew__: justWB, __strLost__: [""], __strDisabled__: [""]}
-                # Add more specific exceptions if needed
-                # Handle the error accordingly	
-                print("ERROR on opening config-file.")
+    else:   # a file already exists. Check for new and lost Workbenches
+        loaded, error = core.load_json(__pathGroupFile__)
+        if error:
+            # Don't save here, so the user can still repair the broken file.
+            print(error)
+            print("ERROR on opening config-file.")
+            __groupedWB__ = core.default_groups(installed)
+        else:
+            __groupedWB__ = core.sync_groups(loaded, installed)
 
     if not os.path.exists(__pathAliasFile__):
-        # generate a template file for renaming WB.
         print("Renaming-file not found: generating new Template.")
-        aliasTemplate = {key: "" for key in justWB}
-        aliasTemplate["ArchWorkbench"] = "Architecture"
-        aliasTemplate[""] = ""
-        formatted_data = json.dumps(aliasTemplate, indent=4)
-        with open(__pathAliasFile__, 'w') as f:
-            f.write(formatted_data)
+        __aliasNames__ = core.alias_template(installed)
+        core.save_json(__pathAliasFile__, __aliasNames__)
+    else:
+        aliases, error = core.load_json(__pathAliasFile__)
+        if error:
+            print(error)
+        else:
+            __aliasNames__ = aliases
 
-    else:	# a file already exists. Check for new and lost Workbenches
-        with open(__pathAliasFile__, 'r') as f:
-            try: 
-                __aliasNames__  = json.load(f)
-            except json.JSONDecodeError as e:
-                print(f"Error decoding JSON: {e}")
-            except Exception as e:
-                print(f"Error: {e}")
-                # Add more specific exceptions if needed
-                # Handle the error accordingly	
-
-    global __selectedGroup__            
-    __selectedGroup__ = __parameters__.GetString("selectedWB", __strAll__)      # the currently selected Group
-    #__selectedGroup__ = __strAll__
+    global __selectedGroup__
+    __selectedGroup__ = core.resolve_group(__groupedWB__, __parameters__.GetString("selectedWB", __strAll__))
     print("SelectedGroup:",__selectedGroup__)
     return __groupedWB__
 
@@ -182,24 +137,12 @@ __groupedWB__  = openMyWB()
 
 
 def testConfigFile(filePath):
-    if os.path.exists(filePath):
-	
-        with open(filePath, 'r') as f:
-            try: 
-                json.load(f)
-                return False 
-            except json.JSONDecodeError as e:
-                print(f"Error decoding JSON: {e}")
-                return str(f"Error decoding JSON: {e}")
-            except Exception as e:
-                print(f"Error: {e}")
-                # Add more specific exceptions if needed
-                # Handle the error accordingly	
-                print("ERROR on opening file.")
-                return str(f"Error: {e}")
-    else:
-        print("ERROR: file not found!")
-        return False
+    """Return False if the file is a valid config file, otherwise the error message."""
+    data, error = core.load_json(filePath)
+    if error:
+        print(error)
+        return error
+    return False
     
 
 def wbIcon(i):
@@ -230,12 +173,7 @@ def wbActions():
             try:
                 action = QtWidgets.QAction(__tabActions__)
                 action.setCheckable(True)
-                action.setText(wbList[i].MenuText)
-                # replace original names by aliasNames
-                if __aliasNames__ and i in __aliasNames__:
-                    aliasName = __aliasNames__.get(i)
-                    if aliasName:
-                        action.setText(aliasName)
+                action.setText(core.display_name(i, wbList[i].MenuText, __aliasNames__))
                 action.setData(i)
                 action.setIcon(wbIcon(wbList[i].Icon))
                 __actions__[i] = action
@@ -339,6 +277,7 @@ def WB_organizer(groupName = __strAll__):
     def onGroupSelectedAction(group):
         return lambda checked=False, group=group: onGroupSelected(group)
 
+    groupName = core.resolve_group(__groupedWB__, groupName)
     tb.clear()
     wbActions()
     
@@ -380,15 +319,12 @@ def WB_organizer(groupName = __strAll__):
     menu.addSeparator()
 
     # Add the groups to the dropdown-menu
-    for group in __groupedWB__.keys():
-        if group not in [__strDrop__, __strLost__, __strNew__, __strDisabled__]:
-            gr = QtWidgets.QAction(menu)
-            gr.setText(group)
-            if group == __strAll__:
-                gr.setText(__aliasNames__.get(__strAll__))
-            gr.setData(group)
-            gr.triggered.connect(onGroupSelectedAction(group))
-            menu.addAction(gr)
+    for group in core.selectable_groups(__groupedWB__):
+        gr = QtWidgets.QAction(menu)
+        gr.setText(core.group_label(group, __aliasNames__))
+        gr.setData(group)
+        gr.triggered.connect(onGroupSelectedAction(group))
+        menu.addAction(gr)
 
     menu.addSeparator()
 
@@ -415,23 +351,18 @@ def WB_organizer(groupName = __strAll__):
         global btnWB
         btnWB = QtWidgets.QPushButton(w)
         btnWB.setFlat(True)
-        btnWB.setIcon(__actions__.get(activeWB).icon())
-        btnWB.setText(__actions__.get(activeWB).text())
+        activeAction = __actions__.get(activeWB)
+        if activeAction:
+            btnWB.setIcon(activeAction.icon())
+            btnWB.setText(activeAction.text())
         menu = QtWidgets.QMenu(btnWB)
         btnWB.setMenu(menu)
 
-        # Add some WB from the __strDrop__ group directly to the Groups-DropDown
-        group   = groupName
-        groupWB = __groupedWB__.get(group)
-
-        for i in groupWB:                         # Add the inGroupsDD WB
-            if i in __actions__:
-                menu.addAction(__actions__[i])
-            if i.startswith('---'):  # Check if the entry starts with "--"
-                print("Separator added")
-                separator_label = i[3:]  # Remove the leading "--" to get the label
-                separator_action = menu.addSeparator()
-                separator_action.setText(separator_label)
+        for kind, value in core.dropdown_entries(__groupedWB__, groupName, __actions__):
+            if kind == "separator":
+                menu.addSeparator().setText(value)
+            else:
+                menu.addAction(__actions__[value])
 
         menu2_width = menu.sizeHint().width()
         menu.setFixedWidth(menu2_width + 10)
@@ -441,32 +372,20 @@ def WB_organizer(groupName = __strAll__):
 
     else:
         # Tabs ==========================================================================
-        group   = groupName
-        groupWB = __groupedWB__.get(group)
-
         w.setObjectName("TabBar")
         w.setDocumentMode(True)
         w.setUsesScrollButtons(True)
         w.tabBar().setDrawBase(True)
 
-        # Add temporarily the active WB to the Tabs if it's not already there and remove it later again.
-        tempAddedWB = ""                
-        if activeWB not in groupWB:       
-            groupWB.append(activeWB)      
-            tempAddedWB = activeWB
-
-        unchecked = __groupedWB__.get(__strDisabled__)
-        if not unchecked: unchecked = {}  # prevents error in case __strDisabled__ has been changed
-        for i in groupWB:
-            if i in __actions__ and i not in unchecked:
-                if __parameters__.GetString("Style") == "Icon":
-                    r = w.tabBar().addTab(__actions__[i].icon(), None)
-                elif __parameters__.GetString("Style") == "Text":
-                    r = w.tabBar().addTab(__actions__[i].text())
-                else:
-                    r = w.tabBar().addTab(__actions__[i].icon(), __actions__[i].text())
-                w.tabBar().setTabData(r, i)
-                w.tabBar().setTabToolTip(r, __actions__[i].text())
+        for i in core.tab_workbenches(__groupedWB__, groupName, activeWB, __actions__):
+            if __parameters__.GetString("Style") == "Icon":
+                r = w.tabBar().addTab(__actions__[i].icon(), None)
+            elif __parameters__.GetString("Style") == "Text":
+                r = w.tabBar().addTab(__actions__[i].text())
+            else:
+                r = w.tabBar().addTab(__actions__[i].icon(), __actions__[i].text())
+            w.tabBar().setTabData(r, i)
+            w.tabBar().setTabToolTip(r, __actions__[i].text())
 
         for i in range(w.count()):
             if w.tabBar().tabData(i) == activeWB:
@@ -482,10 +401,6 @@ def WB_organizer(groupName = __strAll__):
             w.currentChanged.disconnect(onTab)
 
         w.currentChanged.connect(onTab)
-
-        # Remove the temporarily added Tab again
-        if tempAddedWB:
-            groupWB.remove(tempAddedWB)
 
     return [btn, w]
 
