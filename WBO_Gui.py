@@ -32,10 +32,10 @@ __strNew__        = "WBO New"
 __strLost__       = "WBO Lost"
 __strDisabled__   = "WBO Disabled"
 
-__pathGroupFile__ = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\MyWorkbenches.txt")
-__pathAliasFile__ = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\MyWorkbenchesRenaming.txt")
-__pathInstruct__  = os.path.join(App.getUserAppDataDir(),"Mod\\WB_Organizer\\Resources\\Instructions.txt")
-__pathIcons__     = os.path.dirname(__file__) + "\\Resources\\icons\\"
+__pathGroupFile__ = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "MyWorkbenches.txt")
+__pathAliasFile__ = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "MyWorkbenchesRenaming.txt")
+__pathInstruct__  = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "Resources", "Instructions.txt")
+__pathIcons__     = os.path.join(os.path.dirname(__file__), "Resources", "icons") + os.path.sep
 __pathToolbar__   = "User parameter:BaseApp/Workbench/Global/Toolbar"
 
 __parameters__    = App.ParamGet("User parameter:BaseApp/WB_Organizer")
@@ -517,14 +517,14 @@ import subprocess
 import sys
 
 def openFileInEditor(filePath):
-    """A first, simple solution to edit the config-file that defines the groups"""
+    """A solution to edit the config-file that defines the groups"""
     try:
         if sys.platform.startswith('linux'):
-            subprocess.Popen(['nano', filePath])
+            subprocess.Popen(['xdg-open', filePath])
         elif sys.platform.startswith('win'):
-            subprocess.Popen(['notepad', filePath])
+            os.startfile(filePath)
         elif sys.platform.startswith('darwin'):  # MacOSX
-            subprocess.Popen(['open', '-t', filePath])
+            subprocess.Popen(['open', filePath])
         else:
             print("Operatingsystem not supported.")
     except Exception as e:
@@ -662,7 +662,7 @@ def prefDialog():
     stylePanelLayout.addWidget(r2)
 
     styleLengthLayout = QtWidgets.QVBoxLayout()
-    styleLengthPanel = QtWidgets.QGroupBox("Lenght of Workbench Organizer when free floating:")
+    styleLengthPanel = QtWidgets.QGroupBox("Length of Workbench Organizer when free floating:")
     styleLengthPanel.setLayout(styleLengthLayout)
     styleLengthLayout.addWidget(lineEdit)
     styleLengthLayout.addWidget(explication)
