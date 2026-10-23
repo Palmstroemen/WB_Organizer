@@ -58,7 +58,7 @@ It has three columns:
 **Options (right)**
 * Show the name of the selected group in the groups button, or just the icon.
 * Show the workbenches as tabs or as a dropdown, and the style of the tabs.
-* The length of the WBO when it is free floating (see the tips below).
+* The length of the WBO when it is free floating (you can also drag it, see the tips below).
 * The **?** button opens the online help (the wiki).
 
 All changes are saved and shown immediately.
@@ -82,7 +82,8 @@ Like so:
 
 ![](./Resources/images/WBO_top.png)
 
-Inside the 'preferences' dialog of the WBO on the right side, you'll find a field to enter the **'Length when free floating'**. This allows you to adapt the length of your TabBar to your screen size. 
+To adapt the length of your free floating WBO to your screen size, **drag the small handle at its right end**. The WBO keeps this length, also after a restart.
+Alternatively, you can enter the **'Length when free floating'** in the 'preferences' dialog of the WBO on the right side.
 Confirm your changes with [Shift] + [Return] so as not to leave the whole dialog on [Return] and see an immediate result! 
 
 As we can't hide the standard workbench selector we want to put it a little bit 'out of our sight' to the top right.

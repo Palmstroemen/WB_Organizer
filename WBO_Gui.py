@@ -100,6 +100,51 @@ class TabWidget(QtWidgets.QTabWidget):
         self.setTabPosition(QtWidgets.QTabWidget.TabPosition.West)
 #--------------------------------------------------------------------
 
+class WidthGrip(QtWidgets.QWidget):
+    """Handle at the right end of the free floating toolbar to drag its length."""
+    def __init__(self, toolbar):
+        QtWidgets.QWidget.__init__(self, toolbar)
+        self.toolbar = toolbar
+        self.start   = None     # (mouse x, toolbar width) when the drag started
+        self.setFixedWidth(10)
+        self.setCursor(QtCore.Qt.CursorShape.SizeHorCursor)
+        self.setToolTip("Drag to change the length of the Workbench Organizer")
+
+    @staticmethod
+    def mouseX(event):
+        return event.globalPosition().x() if hasattr(event, "globalPosition") else event.globalX()
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.setPen(self.palette().color(QtGui.QPalette.ColorRole.Mid))
+        x = self.width() // 2
+        for dx in (-2, 1):
+            painter.drawLine(x + dx, 4, x + dx, self.height() - 5)
+        painter.end()
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            self.start = (self.mouseX(event), self.toolbar.width())
+
+    def mouseMoveEvent(self, event):
+        if self.start:
+            x, width = self.start
+            self.toolbar.resize(max(150, int(width + self.mouseX(event) - x)), self.toolbar.height())
+
+    def mouseReleaseEvent(self, event):
+        if self.start:
+            self.start = None
+            setFloatingWidth(self.toolbar.width())
+
+
+def setFloatingWidth(width):
+    """Store the length of the free floating toolbar."""
+    global __floatingWidgetWidth__
+    __floatingWidgetWidth__ = width
+    __parameters__.SetString("floatingWidth", str(width))
+
+#--------------------------------------------------------------------
+
 def saveMyWB():
     core.save_json(__pathGroupFile__, __groupedWB__)
 
@@ -257,6 +302,13 @@ def onOrientationChanged(w):
         layout()
     else:
         pass
+
+    if tb.isFloating():
+        if prefbutton != "Tabs":    # the tabs fill the toolbar, the dropdown button doesn't
+            spacer = QtWidgets.QWidget(tb)
+            spacer.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Preferred)
+            tb.addWidget(spacer)
+        tb.addWidget(WidthGrip(tb))
 
     btn.show()
 
@@ -610,7 +662,6 @@ def prefDialog():
     btnRemove.setToolTip("Remove the selected workbenches from the group")
 
     explication = QtWidgets.QLabel("<i>Confirm your data entry with [Shift] + [Return]<br>to keep the dialog window open.</i>")
-    explication.setStyleSheet("color: lightgrey")
     explication.setWordWrap(True)
 
     lineEdit = QtWidgets.QLineEdit(dialog)
@@ -639,7 +690,6 @@ def prefDialog():
     memberButtons.addWidget(btnRemove)
     memberButtons.addStretch()
     dragHint = QtWidgets.QLabel("<i>Drag to add →</i>")
-    dragHint.setStyleSheet("color: grey")
     dragHint.setToolTip("Drag workbenches from the list of all workbenches into this group.")
     memberButtons.addWidget(dragHint)
     memberLayout.addLayout(memberButtons)
@@ -657,7 +707,7 @@ def prefDialog():
 
     #----------------------- Right Area ----------------------------
     showGRPpanelLayout = QtWidgets.QVBoxLayout()
-    showGRPpanel = QtWidgets.QGroupBox("Show Groupnames in title:")
+    showGRPpanel = QtWidgets.QGroupBox("Show group name:")
     showGRPpanel.setLayout(showGRPpanelLayout)
     r6 = QtWidgets.QRadioButton("show name", showGRPpanel)
     r6.setObjectName("showName")
