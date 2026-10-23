@@ -22,6 +22,7 @@ Keep this module free of FreeCAD and Qt imports so it can be tested with pytest.
 
 import json
 import os
+import shutil
 
 STR_ALL      = "WBO All"
 STR_DROP     = "WBO In Groups Dropdown"
@@ -31,6 +32,10 @@ STR_DISABLED = "WBO Disabled"
 
 INTERNAL_GROUPS = (STR_DROP, STR_NEW, STR_LOST, STR_DISABLED)
 SEPARATOR       = "---"
+
+GROUP_FILE   = "MyWorkbenches.txt"
+ALIAS_FILE   = "MyWorkbenchesRenaming.txt"
+CONFIG_FILES = (GROUP_FILE, ALIAS_FILE)
 
 
 def terminated(entries):
@@ -76,6 +81,25 @@ def sync_groups(groups, installed):
     synced[STR_NEW]  = terminated(new) if new else []
     synced[STR_LOST] = terminated(lost)
     return synced
+
+
+def migrate_config(old_dir, new_dir, names=CONFIG_FILES):
+    """Copy the config files from old_dir to new_dir, unless new_dir has them already.
+
+    Older versions kept the config inside the addon folder, where an addon update
+    can overwrite or delete it. The copies in old_dir are left alone: they are
+    tracked in the repository, and changing them would break 'git pull' for
+    users who edited them. Returns the names of the copied files.
+    """
+    os.makedirs(new_dir, exist_ok=True)
+    copied = []
+    for name in names:
+        old = os.path.join(old_dir, name)
+        new = os.path.join(new_dir, name)
+        if os.path.isfile(old) and not os.path.exists(new):
+            shutil.copy2(old, new)
+            copied.append(name)
+    return copied
 
 
 def load_json(path):

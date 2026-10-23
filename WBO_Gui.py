@@ -42,8 +42,11 @@ __strNew__        = core.STR_NEW
 __strLost__       = core.STR_LOST
 __strDisabled__   = core.STR_DISABLED
 
-__pathGroupFile__ = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "MyWorkbenches.txt")
-__pathAliasFile__ = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "MyWorkbenchesRenaming.txt")
+# The config lives outside the addon folder, so addon updates can't touch it.
+__pathAddon__     = os.path.dirname(os.path.abspath(__file__))
+__pathConfig__    = os.path.join(App.getUserAppDataDir(), "WB_Organizer")
+__pathGroupFile__ = os.path.join(__pathConfig__, core.GROUP_FILE)
+__pathAliasFile__ = os.path.join(__pathConfig__, core.ALIAS_FILE)
 __pathIcons__     = os.path.join(os.path.dirname(__file__), "Resources", "icons") + os.path.sep
 __pathToolbar__   = "User parameter:BaseApp/Workbench/Global/Toolbar"
 
@@ -103,6 +106,11 @@ def saveMyWB():
 
 def openMyWB():
     installed = list(Gui.listWorkbenches())
+    try:
+        for name in core.migrate_config(__pathAddon__, __pathConfig__):
+            print("WB_Organizer: copied {} to {}".format(name, __pathConfig__))
+    except OSError as e:
+        print("WB_Organizer: can't copy the config to {}: {}".format(__pathConfig__, e))
     global __groupedWB__, __aliasNames__
 
     if not __parameters__.GetString("PrefButton"):

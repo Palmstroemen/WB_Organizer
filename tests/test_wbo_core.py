@@ -351,3 +351,30 @@ def test_insert_entries_skips_present_workbenches_but_not_separators():
     entries, first, count = core.insert_entries(["A", "---", "B"], ["B", "C", "---", "C"], 1)
     assert entries == ["A", "C", "---", "---", "B"]
     assert (first, count) == (1, 2)
+
+
+# --- moving the config out of the addon folder --------------------------------
+
+def test_migrate_config_copies_old_files_and_keeps_them(tmp_path):
+    old, new = tmp_path / "addon", tmp_path / "data" / "WB_Organizer"
+    old.mkdir()
+    (old / core.GROUP_FILE).write_text('{"a": 1}')
+    (old / core.ALIAS_FILE).write_text('{"b": 2}')
+    assert core.migrate_config(str(old), str(new)) == [core.GROUP_FILE, core.ALIAS_FILE]
+    assert (new / core.GROUP_FILE).read_text() == '{"a": 1}'
+    assert (old / core.GROUP_FILE).exists()
+
+
+def test_migrate_config_never_overwrites_the_new_config(tmp_path):
+    old, new = tmp_path / "addon", tmp_path / "new"
+    old.mkdir(); new.mkdir()
+    (old / core.GROUP_FILE).write_text("old")
+    (new / core.GROUP_FILE).write_text("mine")
+    assert core.migrate_config(str(old), str(new)) == []
+    assert (new / core.GROUP_FILE).read_text() == "mine"
+
+
+def test_migrate_config_without_old_files_creates_the_folder(tmp_path):
+    new = tmp_path / "new"
+    assert core.migrate_config(str(tmp_path / "missing"), str(new)) == []
+    assert new.is_dir()
