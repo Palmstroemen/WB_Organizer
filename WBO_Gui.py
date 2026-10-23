@@ -22,10 +22,19 @@
 
 import FreeCADGui as Gui
 import FreeCAD as App
-from   PySide2 import QtGui, QtWidgets, QtCore
+# FreeCAD's PySide module wraps PySide2 (Qt5) or PySide6 (Qt6), whichever FreeCAD is built with.
+from   PySide import QtGui, QtCore
+try:
+    from PySide import QtWidgets
+except ImportError:     # FreeCAD < 0.20: no QtWidgets in the PySide module, QtGui holds the widgets
+    QtWidgets = QtGui
 import os
 import webbrowser
 import wbo_core as core
+
+# QAction and QActionGroup moved from QtWidgets (Qt5) to QtGui (Qt6).
+QAction      = getattr(QtWidgets, "QAction", None)      or QtGui.QAction
+QActionGroup = getattr(QtWidgets, "QActionGroup", None) or QtGui.QActionGroup
 
 __strAll__        = core.STR_ALL
 __strDrop__       = core.STR_DROP
@@ -45,7 +54,7 @@ __aliasNames__    = {}
 
 __actions__       = {}
 __mainWindow__    = Gui.getMainWindow()
-__tabActions__    = QtWidgets.QActionGroup(__mainWindow__)
+__tabActions__    = QActionGroup(__mainWindow__)
 
 __floatingWidgetWidth__ = 1330
 
@@ -62,7 +71,7 @@ class WBO(QtWidgets.QTabBar):
 
         for i in range(self.count()):
             self.initStyleOption(opt, i)
-            painter.drawControl(QtWidgets.QStyle.CE_TabBarTabShape, opt)
+            painter.drawControl(QtWidgets.QStyle.ControlElement.CE_TabBarTabShape, opt)
             painter.save()
 
             s = opt.rect.size()
@@ -75,7 +84,7 @@ class WBO(QtWidgets.QTabBar):
             painter.translate(c)
             painter.rotate(90)
             painter.translate(-c)
-            painter.drawControl(QtWidgets.QStyle.CE_TabBarTabLabel, opt)
+            painter.drawControl(QtWidgets.QStyle.ControlElement.CE_TabBarTabLabel, opt)
             painter.restore()
 
     def Deactivated(self):
@@ -86,7 +95,7 @@ class TabWidget(QtWidgets.QTabWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QTabWidget.__init__(self, *args, **kwargs)
         self.setTabBar(WBO(self))
-        self.setTabPosition(QtWidgets.QTabWidget.West)
+        self.setTabPosition(QtWidgets.QTabWidget.TabPosition.West)
 #--------------------------------------------------------------------
 
 def saveMyWB():
@@ -157,9 +166,12 @@ def wbIcon(i):
             icon.append((a
                          .split('"', 1)[1])
                         .rsplit('"', 1)[0])
-        icon = QtGui.QIcon(QtGui.QPixmap(icon))
     else:
-        icon = QtGui.QIcon(QtGui.QPixmap(i))
+        icon = i
+    try:
+        icon = QtGui.QIcon(QtGui.QPixmap(icon))
+    except Exception:   # e.g. an XPM icon the Qt binding can't read
+        icon = QtGui.QIcon()
     if icon.isNull():
         icon = QtGui.QIcon(":/icons/freecad")
     return icon
@@ -171,7 +183,7 @@ def wbActions():
     for i in wbList:
         if i not in __actions__:
             try:
-                action = QtWidgets.QAction(__tabActions__)
+                action = QAction(__tabActions__)
                 action.setCheckable(True)
                 action.setText(core.display_name(i, wbList[i].MenuText, __aliasNames__))
                 action.setData(i)
@@ -229,21 +241,21 @@ def onOrientationChanged(w):
         tb.addWidget(btn)
         tb.addWidget(tab)
         if prefbutton == "Tabs":
-            tab.setTabPosition(QtWidgets.QTabWidget.North)
+            tab.setTabPosition(QtWidgets.QTabWidget.TabPosition.North)
     elif orientation == "South":
         if prefbutton == "Tabs":
-            tab.setTabPosition(QtWidgets.QTabWidget.South)
+            tab.setTabPosition(QtWidgets.QTabWidget.TabPosition.South)
         tb.addWidget(btn)
         tb.addWidget(tab)
     elif orientation == "West":
         if prefbutton == "Tabs":
-            tab.setLayoutDirection(QtCore.Qt.LeftToRight)
-            tab.setTabPosition(QtWidgets.QTabWidget.West)
+            tab.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+            tab.setTabPosition(QtWidgets.QTabWidget.TabPosition.West)
         layout()
     elif orientation == "East":
         if prefbutton == "Tabs":
-            tab.setLayoutDirection(QtCore.Qt.LeftToRight)
-            tab.setTabPosition(QtWidgets.QTabWidget.East)
+            tab.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+            tab.setTabPosition(QtWidgets.QTabWidget.TabPosition.East)
         layout()
     else:
         pass
@@ -320,7 +332,7 @@ def WB_organizer(groupName = __strAll__):
 
     # Add the groups to the dropdown-menu
     for group in core.selectable_groups(__groupedWB__):
-        gr = QtWidgets.QAction(menu)
+        gr = QAction(menu)
         gr.setText(core.group_label(group, __aliasNames__))
         gr.setData(group)
         gr.triggered.connect(onGroupSelectedAction(group))
@@ -328,13 +340,13 @@ def WB_organizer(groupName = __strAll__):
 
     menu.addSeparator()
 
-    pref = QtWidgets.QAction(menu)
+    pref = QAction(menu)
     pref.setText("Preferences ...")
     pref.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Prefs.svg"))
     pref.triggered.connect(onPreferences)
     menu.addAction(pref)
 
-    help = QtWidgets.QAction(menu)
+    help = QAction(menu)
     help.setText("Help ...")
     help.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Help.svg"))
     help.triggered.connect(onHelp)
@@ -379,7 +391,7 @@ def WB_organizer(groupName = __strAll__):
 
         for i in core.tab_workbenches(__groupedWB__, groupName, activeWB, __actions__):
             if __parameters__.GetString("Style") == "Icon":
-                r = w.tabBar().addTab(__actions__[i].icon(), None)
+                r = w.tabBar().addTab(__actions__[i].icon(), "")
             elif __parameters__.GetString("Style") == "Text":
                 r = w.tabBar().addTab(__actions__[i].text())
             else:
@@ -457,7 +469,7 @@ def prefDialog():
     dialog.setLayout(layout)
     #------------------------
     selector = QtWidgets.QListWidget(dialog)
-    selector.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+    selector.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
     btnClose = QtWidgets.QPushButton("Close", dialog)
     btnClose.setToolTip("Close the preferences dialog")
@@ -631,15 +643,15 @@ def prefDialog():
         if item:
             selector.blockSignals(True)
             if item.data(50) == "Unchecked":
-                item.setCheckState(QtCore.Qt.CheckState(2))
+                item.setCheckState(QtCore.Qt.CheckState.Checked)
                 item.setData(50, "Checked")
             else:
-                item.setCheckState(QtCore.Qt.CheckState(0))
+                item.setCheckState(QtCore.Qt.CheckState.Unchecked)
                 item.setData(50, "Unchecked")
             selector.blockSignals(False)
         disabled = []
         for index in range(selector.count()):
-            if selector.item(index).checkState() != QtCore.Qt.Checked:
+            if selector.item(index).checkState() != QtCore.Qt.CheckState.Checked:
                 disabled.append(selector.item(index).data(32))
         __groupedWB__.update({__strDisabled__: disabled})
         saveMyWB()
@@ -795,10 +807,10 @@ def prefDialog():
             item.setIcon(__actions__[i].icon())
             item.setData(32, __actions__[i].data())
             if __actions__[i].data() in position:
-                item.setCheckState(QtCore.Qt.CheckState(2))
+                item.setCheckState(QtCore.Qt.CheckState.Checked)
                 item.setData(50, "Checked")
             if __actions__[i].data() in unchecked:
-                item.setCheckState(QtCore.Qt.CheckState(0))
+                item.setCheckState(QtCore.Qt.CheckState.Unchecked)
                 item.setData(50, "Unchecked")
 
     # set the radio buttons to the stored values
@@ -869,7 +881,7 @@ def onAdd():
 
 def accessoriesMenu():
     """Add WorkbenchOrganizer preferences to accessories menu."""
-    pref = QtWidgets.QAction(__mainWindow__)
+    pref = QAction(__mainWindow__)
     pref.setText("WorkbenchOrganizer")
     pref.setObjectName("WorkbenchOrganizer")
     pref.triggered.connect(onPreferences)
@@ -877,12 +889,12 @@ def accessoriesMenu():
         import AccessoriesMenu
         AccessoriesMenu.addItem("WorkbenchOrganizer")
     except ImportError:
-        a = __mainWindow__.findChild(QtWidgets.QAction, "AccessoriesMenu")
+        a = __mainWindow__.findChild(QAction, "AccessoriesMenu")
         if a:
             a.menu().addAction(pref)
         else:
             mb = __mainWindow__.menuBar()
-            actionAccessories = QtWidgets.QAction(__mainWindow__)
+            actionAccessories = QAction(__mainWindow__)
             actionAccessories.setObjectName("AccessoriesMenu")
             actionAccessories.setIconText("Accessories")
             menu = QtWidgets.QMenu()
