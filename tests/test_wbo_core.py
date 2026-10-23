@@ -1,6 +1,9 @@
 """Tests for the FreeCAD-independent logic of the Workbench Organizer."""
 
 import json
+import os
+import shutil
+import subprocess
 
 import pytest
 
@@ -378,3 +381,24 @@ def test_migrate_config_without_old_files_creates_the_folder(tmp_path):
     new = tmp_path / "new"
     assert core.migrate_config(str(tmp_path / "missing"), str(new)) == []
     assert new.is_dir()
+
+
+# The config files in the addon folder are tracked in git. Users' copies are
+# edited in place by older versions, so any committed change to them makes
+# 'git pull' (the Addon Manager update) fail for those users. Never change them.
+FROZEN_CONFIG = {
+    core.GROUP_FILE: "5b552cfe1c5584bf7e177b490c0ec225bd806d9d",
+    core.ALIAS_FILE: "7a6d9fa91672493b645c2a287bbf44ceb3fb79b1",
+}
+
+
+@pytest.mark.parametrize("name", sorted(FROZEN_CONFIG))
+@pytest.mark.parametrize("spec, where", [("HEAD:", "the last commit"), (":", "the staged changes")])
+def test_shipped_config_files_are_never_changed(name, spec, where):
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if not shutil.which("git") or not os.path.isdir(os.path.join(repo, ".git")):
+        pytest.skip("needs the git repository")
+    blob = subprocess.run(["git", "rev-parse", spec + name], cwd=repo,
+                          capture_output=True, text=True).stdout.strip()
+    assert blob == FROZEN_CONFIG[name], (
+        "{} changed in {}. Restore it with: git checkout 2093153 -- {}".format(name, where, name))
