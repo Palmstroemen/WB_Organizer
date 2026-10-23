@@ -780,6 +780,17 @@ def prefDialog():
             select = __selectedGroup__
         groupList.blockSignals(True)
         groupList.clear()
+        # First the workbenches shown directly in the groups dropdown, as in the dropdown itself.
+        item = QtWidgets.QListWidgetItem("In groups dropdown", groupList)
+        item.setData(32, __strDrop__)
+        item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsDragEnabled)
+        font = item.font()
+        font.setItalic(True)
+        item.setFont(font)
+        item.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_icon.svg"))
+        item.setToolTip("Workbenches shown directly in the groups dropdown, above the groups.")
+        if select == __strDrop__:
+            groupList.setCurrentItem(item)
         for group in core.selectable_groups(__groupedWB__):
             item = QtWidgets.QListWidgetItem(core.group_label(group, __aliasNames__), groupList)
             item.setData(32, group)
@@ -805,14 +816,18 @@ def prefDialog():
             for entry in __groupedWB__.get(group) or []:
                 if entry != "":
                     memberList.addItem(memberItem(entry))
-            memberPanel.setTitle("Workbenches in '{}':".format(group))
+            if group == __strDrop__:
+                memberPanel.setTitle("Workbenches in the groups dropdown:")
+            else:
+                memberPanel.setTitle("Workbenches in '{}':".format(group))
             selectRows(memberList, first, count)
         elif group == __strAll__:
             memberPanel.setTitle("'{}' holds all workbenches.".format(core.group_label(group, __aliasNames__)))
         else:
             memberPanel.setTitle("Workbenches in the group:")
-        for widget in (memberList, btnSeparator, btnDelGroup):
-            widget.setEnabled(editable)
+        memberList.setEnabled(editable)
+        btnSeparator.setEnabled(editable and group != __strDrop__)   # the groups dropdown shows no separators
+        btnDelGroup.setEnabled(editable and group != __strDrop__)
         onMemberSelectionChanged()
 
     def onMemberSelectionChanged():
@@ -843,7 +858,7 @@ def prefDialog():
 
     def onDeleteGroup():
         group = currentGroup()
-        if group is None or group == __strAll__:
+        if group is None or group in (__strAll__, __strDrop__):
             return
         answer = QtWidgets.QMessageBox.question(dialog, "Delete group", "Delete the group '{}'?".format(group))
         if answer != QtWidgets.QMessageBox.StandardButton.Yes:
@@ -880,9 +895,10 @@ def prefDialog():
 
     def onGroupDropped(source, row):
         group = currentGroup()
-        if group is None:
+        if group is None or group == __strDrop__:
             return
-        order, first, count = core.move_entries(entriesOf(groupList), [groupList.currentRow()], row)
+        # The groups dropdown entry stays on top; sort only the groups below it.
+        order, first, count = core.move_entries(entriesOf(groupList)[1:], [groupList.currentRow() - 1], max(row - 1, 0))
         setGroups(core.reorder_groups(__groupedWB__, order))
         fillGroups(group)
         onWorkbenchActivated()

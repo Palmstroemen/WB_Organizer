@@ -48,6 +48,7 @@ It has three columns:
 * **Drag** workbenches inside the group to sort them.
 * **Remove** (or [Del]) removes the selected workbenches from the group (they stay installed, of course).
 * **Add Separator** inserts a separator line below the selected workbench.
+* **In groups dropdown** at the top of the list holds the workbenches that appear directly inside the groups dropdown, above the groups. This might be useful for workbenches like Spreadsheet that you want to have at hand everywhere. Fill it like a group.
 
 **All workbenches (middle)**
 * **Drag** workbenches to sort them. This is the order of the 'All' group.
@@ -125,11 +126,11 @@ To get the original name back, delete the name with [Backspace] and confirm the 
 The 'All' group can be renamed the same way, i.e. to translate it into your language. Leave its name empty to get 'WBO All' back.
 
 ## Special groups
-Besides your own groups and 'All', the WBO keeps some internal groups that you don't see in the dialog:
+Besides your own groups and 'All', the WBO keeps some internal groups in its config file:
 * **WBO New**: workbenches that have been installed since the last start. They are added to the end of 'All'.
 * **WBO Lost**: workbenches that are no longer installed. They keep their place in 'All', in case you install them again.
 * **WBO Disabled**: workbenches you have unchecked in the preferences dialog.
-* **WBO In Groups Dropdown**: workbenches that appear directly inside the groups dropdown. This might be useful for workbenches like Spreadsheet that you might want to have at hand everywhere. *For now, this group can only be set in the config file (see below).*
+* **WBO In Groups Dropdown**: workbenches that appear directly inside the groups dropdown. You edit it as 'In groups dropdown' at the top of the groups list.
 
 ## Where your settings are stored
 The WBO stores your groups in `MyWorkbenches.txt` and your names in `MyWorkbenchesRenaming.txt` inside a folder `WB_Organizer` in FreeCAD's user data folder, i.e. `/home/user/.FreeCAD/WB_Organizer/` on Linux. (Type `App.getUserAppDataDir()` into FreeCAD's Python console to find this folder on your computer.)
