@@ -44,7 +44,6 @@ __strDisabled__   = core.STR_DISABLED
 
 __pathGroupFile__ = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "MyWorkbenches.txt")
 __pathAliasFile__ = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "MyWorkbenchesRenaming.txt")
-__pathInstruct__  = os.path.join(App.getUserAppDataDir(), "Mod", "WB_Organizer", "Resources", "Instructions.txt")
 __pathIcons__     = os.path.join(os.path.dirname(__file__), "Resources", "icons") + os.path.sep
 __pathToolbar__   = "User parameter:BaseApp/Workbench/Global/Toolbar"
 
@@ -144,15 +143,6 @@ def openMyWB():
 
 __groupedWB__  = openMyWB()
 
-
-def testConfigFile(filePath):
-    """Return False if the file is a valid config file, otherwise the error message."""
-    data, error = core.load_json(filePath)
-    if error:
-        print(error)
-        return error
-    return False
-    
 
 def wbIcon(i):
     """Create workbench icon."""
@@ -348,7 +338,7 @@ def WB_organizer(groupName = __strAll__):
 
     help = QAction(menu)
     help.setText("Help ...")
-    help.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Help.svg"))
+    help.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_help.svg"))
     help.triggered.connect(onHelp)
     menu.addAction(help)
 
@@ -440,22 +430,81 @@ def onWorkbenchSelected(a):     # When a WB-Tab has been pressed.
             pass
 
 
-import subprocess
-import sys
+class WBList(QtWidgets.QListWidget):
+    """List of the preferences dialog that hands drops and the [Del] key to callbacks.
 
-def openFileInEditor(filePath):
-    """A solution to edit the config-file that defines the groups"""
-    try:
-        if sys.platform.startswith('linux'):
-            subprocess.Popen(['xdg-open', filePath])
-        elif sys.platform.startswith('win'):
-            os.startfile(filePath)
-        elif sys.platform.startswith('darwin'):  # MacOSX
-            subprocess.Popen(['open', filePath])
+    The drops are handled here instead of by Qt, because Qt5 and Qt6 differ in how
+    a QListWidget moves its items. Qt itself never adds or removes items here.
+    """
+    def __init__(self, parent=None):
+        QtWidgets.QListWidget.__init__(self, parent)
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.DragDrop)
+        self.dropSources = [self]   # lists whose items may be dropped here
+        self.onDrop      = None     # called as onDrop(source, row) after a drop
+        self.onDelete    = None     # called when [Del] is pressed
+
+    def dropRow(self, event):
+        """Position in the list where the drop indicator is."""
+        pos  = event.position().toPoint() if hasattr(event, "position") else event.pos()
+        item = self.itemAt(pos)
+        if item is None:
+            return self.count()
+        row = self.row(item)
+        if pos.y() > self.visualItemRect(item).center().y():
+            row += 1
+        return row
+
+    def dragEnterEvent(self, event):
+        if event.source() in self.dropSources:
+            QtWidgets.QListWidget.dragEnterEvent(self, event)
+            event.setDropAction(QtCore.Qt.DropAction.CopyAction)
+            event.accept()
         else:
-            print("Operatingsystem not supported.")
-    except Exception as e:
-        print(f"Error on opening file: {e}")
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.source() in self.dropSources:
+            QtWidgets.QListWidget.dragMoveEvent(self, event)   # draws the drop indicator
+            event.setDropAction(QtCore.Qt.DropAction.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        source = event.source()
+        if source in self.dropSources and self.onDrop:
+            # A CopyAction keeps Qt from removing the dragged items from the source list.
+            event.setDropAction(QtCore.Qt.DropAction.CopyAction)
+            event.accept()
+            row = self.dropRow(event)
+            self.setState(QtWidgets.QAbstractItemView.State.NoState)   # hides the drop indicator
+            self.viewport().update()
+            self.onDrop(source, row)
+        else:
+            event.ignore()
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key.Key_Delete and self.onDelete:
+            self.onDelete()
+        else:
+            QtWidgets.QListWidget.keyPressEvent(self, event)
+
+
+def setGroups(groups):
+    """Store edited groups."""
+    global __groupedWB__
+    __groupedWB__ = groups
+    saveMyWB()
+
+
+def setSelectedGroup(group):
+    """Set the group shown in the toolbar."""
+    global __selectedGroup__
+    __selectedGroup__ = group
+    __parameters__.SetString("selectedWB", group)
 
 
 def prefDialog():
@@ -463,13 +512,24 @@ def prefDialog():
     wbActions()
     dialog = QtWidgets.QDialog(__mainWindow__)
     dialog.setModal(True)
-    dialog.resize(700, 650)
+    dialog.resize(1000, 650)
     dialog.setWindowTitle("WorkbenchOrganizer preferences")
     layout = QtWidgets.QVBoxLayout()
     dialog.setLayout(layout)
+    grey = QtGui.QBrush(QtGui.QColor("grey"))
     #------------------------
-    selector = QtWidgets.QListWidget(dialog)
+    selector = WBList(dialog)
     selector.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    selector.setToolTip("Drag workbenches to sort them, or into a group to add them.\nUncheck workbenches to hide them.")
+    selector.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+
+    groupList = WBList(dialog)
+    groupList.setToolTip("Drag a group to sort the groups dropdown.\nDouble-click a group to rename it.")
+
+    memberList = WBList(dialog)
+    memberList.dropSources = [memberList, selector]
+    memberList.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+    memberList.setToolTip("Drag workbenches here from the list of all workbenches.\nDrag them inside this list to sort them.\n[Del] removes them from the group.")
 
     btnClose = QtWidgets.QPushButton("Close", dialog)
     btnClose.setToolTip("Close the preferences dialog")
@@ -477,53 +537,23 @@ def prefDialog():
 
     btnHelp = QtWidgets.QPushButton(dialog)
     btnHelp.setToolTip("Get online help to the Workbench-Organizer")
-    btnHelp.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_Help.svg"))
+    btnHelp.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_help.svg"))
 
-    btnAdd = QtWidgets.QPushButton(dialog)
-    btnAdd.setToolTip("Start the AddOn-Manager to add further Workbenches")
-    btnAdd.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_AddWorkbench.svg"))
+    btnNewGroup = QtWidgets.QPushButton("New", dialog)
+    btnNewGroup.setToolTip("Create a new group")
 
-    btnUp = QtWidgets.QPushButton(dialog)
-    btnUp.setToolTip("Move selected item up")
-    btnUp.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_MoveUp"))
+    btnDelGroup = QtWidgets.QPushButton("Delete", dialog)
+    btnDelGroup.setToolTip("Delete the selected group")
 
-    btnDown = QtWidgets.QPushButton(dialog)
-    btnDown.setToolTip("Move selected item down")
-    btnDown.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_MoveDown"))
+    btnSeparator = QtWidgets.QPushButton("Separator", dialog)
+    btnSeparator.setToolTip("Insert a separator below the selected workbench")
 
-    btnInstructions = QtWidgets.QPushButton(dialog)
-    btnInstructions.setToolTip("Show instructions how to define groups")
-    btnInstructions.setText("Show instructions")
-
-    btnFile = QtWidgets.QPushButton(dialog)
-    btnFile.setToolTip("Open and Edit the config-file")
-    btnFile.setText("Open config-file")
-
-    btnTest = QtWidgets.QPushButton(dialog)
-    btnTest.setToolTip("Test if the config-file is correct")
-    btnTest.setText("Test config-file")
-
-    btnResult = QtWidgets.QPushButton(dialog)
-    btnResult.setToolTip("Push to hide for next test.")
-    btnResult.setText("")
-    btnResult.setVisible(False)
-
-    txtResult = QtWidgets.QTextEdit(dialog)
-    txtResult.setVisible(False)
-    txtResult.setStyleSheet("color: #8B0000;")
-
-    labelRename = QtWidgets.QLabel("Rename your WB here:")
-
-    btnRename = QtWidgets.QPushButton(dialog)
-    btnRename.setToolTip("Open and Edit the rename-file")
-    btnRename.setText("Open rename-file")
-
-    btnTestRename = QtWidgets.QPushButton(dialog)
-    btnTestRename.setToolTip("Check the rename-file")
-    btnTestRename.setText("Test rename-file")
+    btnRemove = QtWidgets.QPushButton("Remove", dialog)
+    btnRemove.setToolTip("Remove the selected workbenches from the group")
 
     explication = QtWidgets.QLabel("<i>Confirm your data entry with [Shift] + [Return]<br>to keep the dialog window open.</i>")
     explication.setStyleSheet("color: lightgrey")
+    explication.setWordWrap(True)
 
     lineEdit = QtWidgets.QLineEdit(dialog)
     lineEdit.setGeometry(QtCore.QRect(30, 40, 211, 22))
@@ -532,19 +562,36 @@ def prefDialog():
     lineEdit.setToolTip("Use this to set the length of the tabbar\nif you want to place the Workbench Organizer\ni.e. on top of the header line of FreeCAD.")
     #lineEdit.setIconText("Length of freefloating tab")
     lineEdit.setText(str(__floatingWidgetWidth__))
-    #----------------------- Center Area
-    groupsPanel= QtWidgets.QGroupBox("Define your groups here:")
-    groupsButtons = QtWidgets.QVBoxLayout()
-    groupsButtons.addWidget(btnInstructions)
-    groupsButtons.addWidget(btnFile)
-    groupsButtons.addWidget(btnTest)
-    groupsButtons.addWidget(labelRename)
-    groupsButtons.addWidget(btnRename)
-    groupsButtons.addWidget(btnTestRename)
-    groupsButtons.addWidget(btnResult)
-    groupsButtons.addWidget(txtResult)
+    #----------------------- Left Area: groups and their workbenches
+    groupsPanel = QtWidgets.QGroupBox("Groups:")
+    groupsLayout = QtWidgets.QVBoxLayout()
+    groupsLayout.addWidget(groupList)
+    groupsButtons = QtWidgets.QHBoxLayout()
+    groupsButtons.addWidget(btnNewGroup)
+    groupsButtons.addWidget(btnDelGroup)
     groupsButtons.addStretch()
-    groupsPanel.setLayout(groupsButtons)
+    groupsLayout.addLayout(groupsButtons)
+    groupsPanel.setLayout(groupsLayout)
+
+    memberPanel = QtWidgets.QGroupBox("Workbenches in the group:")
+    memberLayout = QtWidgets.QVBoxLayout()
+    memberLayout.addWidget(memberList)
+    memberButtons = QtWidgets.QHBoxLayout()
+    memberButtons.addWidget(btnSeparator)
+    memberButtons.addWidget(btnRemove)
+    memberButtons.addStretch()
+    memberLayout.addLayout(memberButtons)
+    memberPanel.setLayout(memberLayout)
+
+    l1 = QtWidgets.QVBoxLayout()
+    l1.addWidget(groupsPanel, 2)
+    l1.addWidget(memberPanel, 3)
+
+    #----------------------- Center Area: all workbenches
+    allPanel = QtWidgets.QGroupBox("All workbenches:")
+    allLayout = QtWidgets.QVBoxLayout()
+    allLayout.addWidget(selector)
+    allPanel.setLayout(allLayout)
 
     #----------------------- Right Area ----------------------------
     showGRPpanelLayout = QtWidgets.QHBoxLayout()
@@ -561,7 +608,7 @@ def prefDialog():
     showGRPpanelLayout.addWidget(r7)
     #--------------------------------------------------------------
     showWBpanelLayout = QtWidgets.QVBoxLayout()
-    showWBpanel = QtWidgets.QGroupBox("Show Workbenches as Tabs or as Dropdown:")
+    showWBpanel = QtWidgets.QGroupBox("Show Workbenches as:")
     showWBpanel.setLayout(showWBpanelLayout)
     r8 = QtWidgets.QRadioButton("Tabs", showWBpanel)
     r8.setObjectName("Tabs")
@@ -572,7 +619,7 @@ def prefDialog():
     showWBpanelLayout.addWidget(r9)
     showWBpanelLayout.addWidget(r8)
     #--------------------------------------------------------------
-    stylePanelLayout = QtWidgets.QHBoxLayout()
+    stylePanelLayout = QtWidgets.QVBoxLayout()
     stylePanel = QtWidgets.QGroupBox("Tabs-Style:")
     stylePanel.setLayout(stylePanelLayout)
     r0 = QtWidgets.QRadioButton("Icon", stylePanel)
@@ -589,46 +636,34 @@ def prefDialog():
     stylePanelLayout.addWidget(r2)
 
     styleLengthLayout = QtWidgets.QVBoxLayout()
-    styleLengthPanel = QtWidgets.QGroupBox("Length of Workbench Organizer when free floating:")
+    styleLengthPanel = QtWidgets.QGroupBox("Length when free floating:")
     styleLengthPanel.setLayout(styleLengthLayout)
     styleLengthLayout.addWidget(lineEdit)
     styleLengthLayout.addWidget(explication)
     #-----------------------
-    buttonsPanel = QtWidgets.QHBoxLayout()    # die untere Leiste mit den Up/down und Close-Buttons
+    buttonsPanel = QtWidgets.QHBoxLayout()    # Help- und Close-Button unten im rechten Bereich
     buttonsPanel.addWidget(btnHelp)
-    buttonsPanel.addWidget(btnAdd)
-    buttonsPanel.addWidget(btnUp)
-    buttonsPanel.addWidget(btnDown)
     buttonsPanel.addStretch(1)
     buttonsPanel.addWidget(btnClose)
     #-----------------------
-    l3 = QtWidgets.QHBoxLayout()
-    l3.addStretch()
     l4 = QtWidgets.QVBoxLayout()
     l4.addWidget(showGRPpanel)
     l4.addWidget(showWBpanel)
     l4.addWidget(stylePanel)
     l4.addWidget(styleLengthPanel)
     l4.addStretch()
-    l4.insertLayout(0, l3)
+    l4.addLayout(buttonsPanel)
+    optionsArea = QtWidgets.QWidget(dialog)
+    optionsArea.setLayout(l4)
+    optionsArea.setMaximumWidth(260)
+    l4.setContentsMargins(0, 0, 0, 0)
     #--------------------------------------
     l5 = QtWidgets.QHBoxLayout()
-    l5.addWidget(selector)      # All List
-    l5.addWidget(groupsPanel)   # Groups
-    l5.insertLayout(2, l4)      # Radio-Buttons
+    l5.addLayout(l1, 3)             # Groups and their workbenches
+    l5.addWidget(allPanel, 3)       # All List
+    l5.addWidget(optionsArea, 2)    # Radio-Buttons
 
-    #layout.insertLayout(0, l5)  # die beiden Bereiche Links Liste, Rechts Radio-Buttons
-    #layout.insertLayout(1, buttonsPanel)  # die untere Lesite mit den Buttons
-
-    # Create a top-level horizontal layout
-    top_layout = QtWidgets.QHBoxLayout()
-
-    # Add the left and right areas to the top-level layout
-    top_layout.insertLayout(0, l5)  # die beiden Bereiche Links Liste, Rechts Radio-Buttons
-
-    # Add the top-level layout to the main layout
-    layout.addLayout(top_layout)
-    layout.insertLayout(1, buttonsPanel)  # die untere Lesite mit den Buttons
+    layout.addLayout(l5)
 
     def onAccepted():
         """Close dialog on button close."""
@@ -638,6 +673,161 @@ def prefDialog():
         """Delete dialog on close."""
         dialog.deleteLater()
 
+    #----------------------- groups and their workbenches
+    def currentGroup():
+        """Group selected in the groups list."""
+        item = groupList.currentItem()
+        return item.data(32) if item else None
+
+    def entriesOf(listWidget):
+        return [listWidget.item(r).data(32) for r in range(listWidget.count())]
+
+    def selectRows(listWidget, first, count):
+        listWidget.clearSelection()
+        for r in range(first, first + count):
+            listWidget.item(r).setSelected(True)
+        if count:
+            listWidget.setCurrentRow(first, QtCore.QItemSelectionModel.SelectionFlag.NoUpdate)
+
+    def memberItem(entry):
+        """List item for a workbench or a separator of a group."""
+        item = QtWidgets.QListWidgetItem()
+        item.setData(32, entry)
+        label = core.separator_label(entry)
+        if label is not None:
+            item.setText("──── " + label + " ────" if label else "────────────")
+            item.setForeground(grey)
+            item.setToolTip("Separator")
+        elif entry in __actions__:
+            item.setText(__actions__[entry].text())
+            item.setIcon(__actions__[entry].icon())
+        else:
+            item.setText(entry)
+            item.setForeground(grey)
+            item.setToolTip("This workbench is not installed.")
+        return item
+
+    def fillGroups(select=None):
+        """Show the groups and select the group select (default: the toolbar's group)."""
+        if select is None:
+            select = __selectedGroup__
+        groupList.blockSignals(True)
+        groupList.clear()
+        for group in core.selectable_groups(__groupedWB__):
+            item = QtWidgets.QListWidgetItem(core.group_label(group, __aliasNames__), groupList)
+            item.setData(32, group)
+            if group == __strAll__:
+                font = item.font()
+                font.setItalic(True)
+                item.setFont(font)
+                item.setToolTip("All workbenches, sorted in the list in the middle.")
+            else:
+                item.setFlags(item.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
+            if group == select:
+                groupList.setCurrentItem(item)
+        groupList.blockSignals(False)
+        fillMembers()
+
+    def fillMembers(first=0, count=0):
+        """Show the workbenches of the selected group."""
+        group = currentGroup()
+        editable = group is not None and group != __strAll__
+        memberList.clear()
+        if editable:
+            for entry in __groupedWB__.get(group) or []:
+                if entry != "":
+                    memberList.addItem(memberItem(entry))
+            memberPanel.setTitle("Workbenches in '{}':".format(group))
+            selectRows(memberList, first, count)
+        elif group == __strAll__:
+            memberPanel.setTitle("'{}' holds all workbenches.".format(core.group_label(group, __aliasNames__)))
+        else:
+            memberPanel.setTitle("Workbenches in the group:")
+        for widget in (memberList, btnSeparator, btnRemove, btnDelGroup):
+            widget.setEnabled(editable)
+
+    def storeMembers(entries, first=0, count=0):
+        """Save the workbenches of the selected group and show them again."""
+        setGroups(core.set_members(__groupedWB__, currentGroup(), entries))
+        fillMembers(first, count)
+        onWorkbenchActivated()
+
+    def showError(title, error):
+        QtWidgets.QMessageBox.warning(dialog, title, str(error))
+
+    def onNewGroup():
+        name, ok = QtWidgets.QInputDialog.getText(dialog, "New group", "Name of the new group:")
+        if not ok:
+            return
+        name = name.strip()
+        try:
+            groups = core.add_group(__groupedWB__, name)
+        except ValueError as e:
+            showError("New group", e)
+            return
+        setGroups(groups)
+        fillGroups(name)
+        onWorkbenchActivated()
+
+    def onDeleteGroup():
+        group = currentGroup()
+        if group is None or group == __strAll__:
+            return
+        answer = QtWidgets.QMessageBox.question(dialog, "Delete group", "Delete the group '{}'?".format(group))
+        if answer != QtWidgets.QMessageBox.StandardButton.Yes:
+            return
+        setGroups(core.delete_group(__groupedWB__, group))
+        if __selectedGroup__ == group:
+            setSelectedGroup(__strAll__)
+        fillGroups(__strAll__)
+        onWorkbenchActivated()
+
+    def onGroupRenamed(item):
+        old = item.data(32)
+        new = item.text().strip()
+        try:
+            groups = core.rename_group(__groupedWB__, old, new)
+        except ValueError as e:
+            showError("Rename group", e)
+            new = old
+        else:
+            setGroups(groups)
+            if __selectedGroup__ == old:
+                setSelectedGroup(new)
+            onWorkbenchActivated()
+        # Rebuild the list after Qt has finished editing the item.
+        QtCore.QTimer.singleShot(0, lambda: fillGroups(new))
+
+    def onGroupDropped(source, row):
+        group = currentGroup()
+        if group is None:
+            return
+        order, first, count = core.move_entries(entriesOf(groupList), [groupList.currentRow()], row)
+        setGroups(core.reorder_groups(__groupedWB__, order))
+        fillGroups(group)
+        onWorkbenchActivated()
+
+    def onMembersDropped(source, row):
+        entries = entriesOf(memberList)
+        if source is memberList:
+            rows = [memberList.row(i) for i in memberList.selectedItems()]
+            entries, first, count = core.move_entries(entries, rows, row)
+        else:
+            new = [i.data(32) for i in sorted(source.selectedItems(), key=source.row)]
+            entries, first, count = core.insert_entries(entries, new, row)
+        storeMembers(entries, first, count)
+
+    def onRemoveMembers():
+        rows = set(memberList.row(i) for i in memberList.selectedItems())
+        if rows:
+            storeMembers([e for r, e in enumerate(entriesOf(memberList)) if r not in rows])
+
+    def onSeparator():
+        row = memberList.currentRow() + 1 if memberList.currentItem() else memberList.count()
+        entries, first, count = core.insert_entries(entriesOf(memberList), [core.SEPARATOR], row)
+        storeMembers(entries, first, count)
+
+    #----------------------- all workbenches
     def onItemChanged(item=None):
         """Save workbench list state."""
         if item:
@@ -658,95 +848,25 @@ def prefDialog():
 
         onWorkbenchActivated()
 
-    def onUp():
-        """Save workbench position list."""
-        currentIndex = selector.currentRow()
-        if currentIndex != 0:
-            selector.blockSignals(True)
-            currentItem = selector.takeItem(currentIndex)
-            selector.insertItem(currentIndex - 1, currentItem)
-            selector.setCurrentRow(currentIndex - 1)
-            selector.blockSignals(False)
-            position = []
-            for index in range(selector.count()):
-                position.append(selector.item(index).data(32))
-            __groupedWB__.update({__strAll__: position})
-            saveMyWB()
-            onItemChanged()
+    def onAllDropped(source, row):
+        """Sort the list of all workbenches."""
+        rows = [selector.row(i) for i in selector.selectedItems()]
+        if not rows:
+            return
+        entries, first, count = core.move_entries(entriesOf(selector), rows, row)
+        selector.blockSignals(True)
+        items = {selector.item(r).data(32): selector.takeItem(r) for r in reversed(range(selector.count()))}
+        for wb in entries:
+            selector.addItem(items[wb])
+        selector.blockSignals(False)
+        selectRows(selector, first, count)
+        # Workbenches that are not installed aren't listed, but keep them in 'All'.
+        hidden = [wb for wb in __groupedWB__.get(__strAll__) or [] if wb not in items]
+        __groupedWB__.update({__strAll__: core.terminated(entries + hidden)})
+        saveMyWB()
+        onItemChanged()
 
-    def onDown():
-        """Save workbench position list."""
-        currentIndex = selector.currentRow()
-        if currentIndex != selector.count() - 1 and currentIndex != -1:
-            selector.blockSignals(True)
-            currentItem = selector.takeItem(currentIndex)
-            selector.insertItem(currentIndex + 1, currentItem)
-            selector.setCurrentRow(currentIndex + 1)
-            selector.blockSignals(False)
-            position = []
-            for index in range(selector.count()):
-                position.append(selector.item(index).data(32))
-            __groupedWB__.update({__strAll__: position})
-            saveMyWB()
-            onItemChanged()
-
-    def onOpenFile():
-        """Open the configuration file"""
-        openFileInEditor(__pathGroupFile__)
-
-
-    def onOpenRenameFile():
-        """Open the configuration file"""
-        openFileInEditor(__pathAliasFile__)
-
-
-    def onTestFile():
-        """Test the configuration file"""
-        Error = testConfigFile(__pathGroupFile__)
-        if not Error:
-            openMyWB()
-            btnResult.setText("Config-file OK")
-            btnResult.setStyleSheet("background-color: green; color: white;")
-            txtResult.setVisible(False)
-
-        else:
-            btnResult.setText("ERROR in config-file")
-            btnResult.setStyleSheet("background-color: red; color: white;")
-            txtResult.setText(Error)
-            txtResult.setVisible(True)
-        btnResult.setFlat(True)
-        btnResult.setVisible(True)
-
-    def onTestRenameFile():
-        """Test the configuration file"""
-        Error = testConfigFile(__pathAliasFile__)
-        if not Error:
-            openMyWB()
-            btnResult.setText("Rename-file OK")
-            btnResult.setStyleSheet("background-color: green; color: white;")
-            txtResult.setVisible(False)
-
-        else:
-            btnResult.setText("ERROR in rename-file")
-            btnResult.setStyleSheet("background-color: red; color: white;")
-            txtResult.setText(Error)
-            txtResult.setVisible(True)
-        btnResult.setFlat(True)
-        btnResult.setVisible(True)
-
-    
-    def onResult():
-        """Hide the Result-Button again"""
-        btnResult.setVisible(False)
-        txtResult.setVisible(False)
-
-
-
-    def onShowInstructions():
-        """Open the configuration file"""
-        openFileInEditor(__pathInstruct__)
-
-
+    #----------------------- options
     def on_lineEdit_clicked():
         global __floatingWidgetWidth__
         # if self.lineEdit.textChanged():
@@ -780,26 +900,13 @@ def prefDialog():
             onWorkbenchActivated()
 
 
-    """ 
-    # This is a trial to prevent the 'Return' signal escaping the lineEdit-Widget and
-    # propagating to the 'close' button. But doesn't work yet.
-    def eventFilter(obj, event):
-        if obj is line_edit and event.type() == QtCore.QEvent.KeyPress:
-            # Check if the pressed key is 'Return'
-            if event.key() == QtCore.Qt.Key_Return:
-                # Prevent the 'Return' key event from being propagated to the line edit
-                return True
-        return False
-    #lineEdit.installEventFilter(eventFilter)
-    """
-
     unchecked = __groupedWB__.get(__strDisabled__)
     if not unchecked: unchecked = {}  # prevents error in case __strDisabled__ has been changed
     position  = __groupedWB__.get(__strAll__)
     if not position: position = {}    # prevents error in case __strAll__ has been changed
 
 
-    # build up the list of WB and set the CheckState        
+    # build up the list of WB and set the CheckState
     for i in position:
         if i in __actions__:
             item = QtWidgets.QListWidgetItem(selector)
@@ -812,6 +919,8 @@ def prefDialog():
             if __actions__[i].data() in unchecked:
                 item.setCheckState(QtCore.Qt.CheckState.Unchecked)
                 item.setData(50, "Unchecked")
+
+    fillGroups()
 
     # set the radio buttons to the stored values
     groupStyle = __parameters__.GetString("GroupStyle", "showName")
@@ -845,19 +954,22 @@ def prefDialog():
     r1.toggled.connect(onstylePanel)
     r2.toggled.connect(onstylePanel)
 
+    groupList.onDrop   = onGroupDropped
+    groupList.onDelete = onDeleteGroup
+    memberList.onDrop   = onMembersDropped
+    memberList.onDelete = onRemoveMembers
+    groupList.currentItemChanged.connect(lambda current, previous: fillMembers())
+    groupList.itemChanged.connect(onGroupRenamed)
+    btnNewGroup.clicked.connect(onNewGroup)
+    btnDelGroup.clicked.connect(onDeleteGroup)
+    btnSeparator.clicked.connect(onSeparator)
+    btnRemove.clicked.connect(onRemoveMembers)
+
     btnHelp.clicked.connect(onHelp)
-    btnAdd.clicked.connect(onAdd)
-    btnUp.clicked.connect(onUp)
-    btnDown.clicked.connect(onDown)
+    selector.onDrop = onAllDropped
     selector.itemChanged.connect(onItemChanged)
     dialog.finished.connect(onFinished)
     btnClose.clicked.connect(onAccepted)
-    btnFile.clicked.connect(onOpenFile)
-    btnTest.clicked.connect(onTestFile)
-    btnResult.clicked.connect(onResult)
-    btnRename.clicked.connect(onOpenRenameFile)
-    btnTestRename.clicked.connect(onTestRenameFile)
-    btnInstructions.clicked.connect(onShowInstructions)
     lineEdit.returnPressed.connect(on_lineEdit_clicked) #connection lineEdit
 
     return dialog
@@ -872,10 +984,6 @@ def onPreferences():
 def onHelp():
     """Open a help page."""
     webbrowser.open("https://github.com/Palmstroemen/WB_Organizer/wiki")
-
-
-def onAdd():
-    Gui.runCommand('Std_AddonMgr',0)
 
 #==================================================================================================================================
 
