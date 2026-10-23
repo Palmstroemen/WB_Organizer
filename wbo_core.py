@@ -302,11 +302,14 @@ def has_alias(wb, aliases):
     return bool((aliases or {}).get(wb))
 
 
-def set_alias(aliases, wb, name):
-    """Return aliases with the alias of wb set to name. An empty name removes the alias."""
+def set_alias(aliases, wb, name, default=None):
+    """Return aliases with the alias of wb set to name.
+
+    An empty name or the default name removes the alias.
+    """
     result = dict(aliases or {})
     name = name.strip()
-    if name:
+    if name and name != default:
         result[wb] = name
     else:
         result.pop(wb, None)

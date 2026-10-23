@@ -402,3 +402,14 @@ def test_shipped_config_files_are_never_changed(name, spec, where):
                           capture_output=True, text=True).stdout.strip()
     assert blob == FROZEN_CONFIG[name], (
         "{} changed in {}. Restore it with: git checkout 2093153 -- {}".format(name, where, name))
+
+
+def test_set_alias_to_the_default_name_removes_alias():
+    aliases = core.set_alias({"DraftWorkbench": "2D"}, "DraftWorkbench", "Draft", default="Draft")
+    assert not core.has_alias("DraftWorkbench", aliases)
+
+
+def test_alias_of_all_group_is_its_label():
+    aliases = core.set_alias({}, STR_ALL, "Everything", default=STR_ALL)
+    assert core.group_label(STR_ALL, aliases) == "Everything"
+    assert core.group_label(STR_ALL, core.set_alias(aliases, STR_ALL, STR_ALL, default=STR_ALL)) == STR_ALL

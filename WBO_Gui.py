@@ -501,11 +501,54 @@ class WBList(QtWidgets.QListWidget):
             QtWidgets.QListWidget.keyPressEvent(self, event)
 
 
+class NameDelegate(QtWidgets.QStyledItemDelegate):
+    """Editor for names in the lists of the preferences dialog.
+
+    It shows the current name grey and selected, so the first key replaces it.
+    The placeholder of an empty editor is the name that an empty entry restores.
+    """
+    untouched = ("QLineEdit { background-color: palette(base); color: grey; border: 1px solid palette(highlight);"
+                 " selection-background-color: palette(base); selection-color: grey; }")
+    edited    = "QLineEdit { background-color: palette(base); color: palette(text); border: 1px solid palette(highlight); }"
+
+    def __init__(self, parent, placeholder):
+        QtWidgets.QStyledItemDelegate.__init__(self, parent)
+        self.placeholder = placeholder   # function(index) -> name shown in an empty editor
+
+    def createEditor(self, parent, option, index):
+        editor = QtWidgets.QLineEdit(parent)
+        editor.setStyleSheet(self.untouched)   # an own background: FreeCAD's style sheets may make editors transparent
+        editor.textEdited.connect(lambda text: editor.setStyleSheet(self.edited))
+        return editor
+
+    def setEditorData(self, editor, index):
+        editor.setText(index.data())
+        editor.setPlaceholderText(self.placeholder(index))
+        editor.selectAll()
+
+
 def setGroups(groups):
     """Store edited groups."""
     global __groupedWB__
     __groupedWB__ = groups
     saveMyWB()
+
+
+def setAliases(aliases):
+    """Store edited aliases and show them on the workbench actions."""
+    global __aliasNames__
+    __aliasNames__ = aliases
+    core.save_json(__pathAliasFile__, __aliasNames__)
+    wbList = Gui.listWorkbenches()
+    for wb, action in __actions__.items():
+        if wb in wbList:
+            action.setText(core.display_name(wb, wbList[wb].MenuText, __aliasNames__))
+
+
+def defaultName(wb):
+    """Name of a workbench without alias."""
+    wbList = Gui.listWorkbenches()
+    return wbList[wb].MenuText if wb in wbList else wb
 
 
 def setSelectedGroup(group):
@@ -525,13 +568,16 @@ def prefDialog():
     layout = QtWidgets.QVBoxLayout()
     dialog.setLayout(layout)
     grey = QtGui.QBrush(QtGui.QColor("grey"))
+    blue = QtGui.QBrush(QtGui.QColor("#2f7fe0"))   # aliases; readable on light and dark themes
     #------------------------
     selector = WBList(dialog)
+    selector.setItemDelegate(NameDelegate(selector, lambda index: defaultName(index.data(32))))
     selector.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     selector.setToolTip("Drag workbenches to sort them, or into a group to add them.\nUncheck workbenches to hide them.")
     selector.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
 
     groupList = WBList(dialog)
+    groupList.setItemDelegate(NameDelegate(groupList, lambda index: index.data(32)))
     groupList.setToolTip("Drag a group to sort the groups dropdown.\nDouble-click a group to rename it.")
 
     memberList = WBList(dialog)
@@ -546,6 +592,10 @@ def prefDialog():
     btnHelp = QtWidgets.QPushButton(dialog)
     btnHelp.setToolTip("Get online help to the Workbench-Organizer")
     btnHelp.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_help.svg"))
+    btnHelp.setIconSize(QtCore.QSize(28, 28))
+    btnHelp.setFlat(True)
+    btnHelp.setStyleSheet("QPushButton { border: none; background: transparent; }")
+    btnHelp.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
 
     btnNewGroup = QtWidgets.QPushButton("New", dialog)
     btnNewGroup.setToolTip("Create a new group")
@@ -553,7 +603,7 @@ def prefDialog():
     btnDelGroup = QtWidgets.QPushButton("Delete", dialog)
     btnDelGroup.setToolTip("Delete the selected group")
 
-    btnSeparator = QtWidgets.QPushButton("Separator", dialog)
+    btnSeparator = QtWidgets.QPushButton("Add Separator", dialog)
     btnSeparator.setToolTip("Insert a separator below the selected workbench")
 
     btnRemove = QtWidgets.QPushButton("Remove", dialog)
@@ -588,6 +638,10 @@ def prefDialog():
     memberButtons.addWidget(btnSeparator)
     memberButtons.addWidget(btnRemove)
     memberButtons.addStretch()
+    dragHint = QtWidgets.QLabel("<i>Drag to add →</i>")
+    dragHint.setStyleSheet("color: grey")
+    dragHint.setToolTip("Drag workbenches from the list of all workbenches into this group.")
+    memberButtons.addWidget(dragHint)
     memberLayout.addLayout(memberButtons)
     memberPanel.setLayout(memberLayout)
 
@@ -596,13 +650,13 @@ def prefDialog():
     l1.addWidget(memberPanel, 3)
 
     #----------------------- Center Area: all workbenches
-    allPanel = QtWidgets.QGroupBox("All workbenches:")
+    allPanel = QtWidgets.QGroupBox("All workbenches (double-click to rename):")
     allLayout = QtWidgets.QVBoxLayout()
     allLayout.addWidget(selector)
     allPanel.setLayout(allLayout)
 
     #----------------------- Right Area ----------------------------
-    showGRPpanelLayout = QtWidgets.QHBoxLayout()
+    showGRPpanelLayout = QtWidgets.QVBoxLayout()
     showGRPpanel = QtWidgets.QGroupBox("Show Groupnames in title:")
     showGRPpanel.setLayout(showGRPpanelLayout)
     r6 = QtWidgets.QRadioButton("show name", showGRPpanel)
@@ -649,13 +703,15 @@ def prefDialog():
     styleLengthLayout.addWidget(lineEdit)
     styleLengthLayout.addWidget(explication)
     #-----------------------
-    buttonsPanel = QtWidgets.QHBoxLayout()    # Help- und Close-Button unten im rechten Bereich
-    buttonsPanel.addWidget(btnHelp)
+    buttonsPanel = QtWidgets.QHBoxLayout()    # Close-Button unten im rechten Bereich
     buttonsPanel.addStretch(1)
     buttonsPanel.addWidget(btnClose)
     #-----------------------
     l4 = QtWidgets.QVBoxLayout()
-    l4.addWidget(showGRPpanel)
+    topRow = QtWidgets.QHBoxLayout()          # Help-Button rechts oben
+    topRow.addWidget(showGRPpanel, 1)
+    topRow.addWidget(btnHelp, 0, QtCore.Qt.AlignmentFlag.AlignTop)
+    l4.addLayout(topRow)
     l4.addWidget(showWBpanel)
     l4.addWidget(stylePanel)
     l4.addWidget(styleLengthPanel)
@@ -663,7 +719,7 @@ def prefDialog():
     l4.addLayout(buttonsPanel)
     optionsArea = QtWidgets.QWidget(dialog)
     optionsArea.setLayout(l4)
-    optionsArea.setMaximumWidth(260)
+    optionsArea.setMaximumWidth(230)
     l4.setContentsMargins(0, 0, 0, 0)
     #--------------------------------------
     l5 = QtWidgets.QHBoxLayout()
@@ -709,6 +765,9 @@ def prefDialog():
         elif entry in __actions__:
             item.setText(__actions__[entry].text())
             item.setIcon(__actions__[entry].icon())
+            if core.has_alias(entry, __aliasNames__):
+                item.setForeground(blue)
+                item.setToolTip("Alias of '{}'".format(defaultName(entry)))
         else:
             item.setText(entry)
             item.setForeground(grey)
@@ -724,13 +783,14 @@ def prefDialog():
         for group in core.selectable_groups(__groupedWB__):
             item = QtWidgets.QListWidgetItem(core.group_label(group, __aliasNames__), groupList)
             item.setData(32, group)
+            item.setFlags(item.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
             if group == __strAll__:
                 font = item.font()
                 font.setItalic(True)
                 item.setFont(font)
                 item.setToolTip("All workbenches, sorted in the list in the middle.")
-            else:
-                item.setFlags(item.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
+                if core.has_alias(group, __aliasNames__):
+                    item.setForeground(blue)
             if group == select:
                 groupList.setCurrentItem(item)
         groupList.blockSignals(False)
@@ -751,8 +811,12 @@ def prefDialog():
             memberPanel.setTitle("'{}' holds all workbenches.".format(core.group_label(group, __aliasNames__)))
         else:
             memberPanel.setTitle("Workbenches in the group:")
-        for widget in (memberList, btnSeparator, btnRemove, btnDelGroup):
+        for widget in (memberList, btnSeparator, btnDelGroup):
             widget.setEnabled(editable)
+        onMemberSelectionChanged()
+
+    def onMemberSelectionChanged():
+        btnRemove.setEnabled(memberList.isEnabled() and bool(memberList.selectedItems()))
 
     def storeMembers(entries, first=0, count=0):
         """Save the workbenches of the selected group and show them again."""
@@ -793,6 +857,14 @@ def prefDialog():
     def onGroupRenamed(item):
         old = item.data(32)
         new = item.text().strip()
+        if not new and old != __strAll__:
+            new = old   # an empty name keeps the group's name
+        if old == __strAll__:
+            # 'All' keeps its key in the config file and gets an alias instead.
+            setAliases(core.set_alias(__aliasNames__, old, new, default=old))
+            onWorkbenchActivated()
+            QtCore.QTimer.singleShot(0, lambda: fillGroups(old))
+            return
         try:
             groups = core.rename_group(__groupedWB__, old, new)
         except ValueError as e:
@@ -836,8 +908,32 @@ def prefDialog():
         storeMembers(entries, first, count)
 
     #----------------------- all workbenches
+    def styleWorkbenchItem(item):
+        """Show the name of a workbench in the list of all workbenches; aliases in blue."""
+        wb = item.data(32)
+        item.setText(__actions__[wb].text())
+        item.setData(51, item.text())   # to tell a rename from a click on the check box
+        if core.has_alias(wb, __aliasNames__):
+            item.setForeground(blue)
+            item.setToolTip("Alias of '{}'. Double-click to rename it,\nleave the name empty to remove the alias.".format(defaultName(wb)))
+        else:
+            item.setData(QtCore.Qt.ItemDataRole.ForegroundRole, None)
+            item.setToolTip("Double-click to rename the workbench.")
+
+    def onWorkbenchRenamed(item):
+        wb = item.data(32)
+        setAliases(core.set_alias(__aliasNames__, wb, item.text(), default=defaultName(wb)))
+        selector.blockSignals(True)
+        styleWorkbenchItem(item)
+        selector.blockSignals(False)
+        fillMembers()
+        onWorkbenchActivated()
+
     def onItemChanged(item=None):
         """Save workbench list state."""
+        if item and item.text() != item.data(51):
+            onWorkbenchRenamed(item)
+            return
         if item:
             selector.blockSignals(True)
             if item.data(50) == "Unchecked":
@@ -918,9 +1014,10 @@ def prefDialog():
     for i in position:
         if i in __actions__:
             item = QtWidgets.QListWidgetItem(selector)
-            item.setText(__actions__[i].text())
             item.setIcon(__actions__[i].icon())
             item.setData(32, __actions__[i].data())
+            item.setFlags(item.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
+            styleWorkbenchItem(item)
             if __actions__[i].data() in position:
                 item.setCheckState(QtCore.Qt.CheckState.Checked)
                 item.setData(50, "Checked")
@@ -972,6 +1069,7 @@ def prefDialog():
     btnDelGroup.clicked.connect(onDeleteGroup)
     btnSeparator.clicked.connect(onSeparator)
     btnRemove.clicked.connect(onRemoveMembers)
+    memberList.itemSelectionChanged.connect(onMemberSelectionChanged)
 
     btnHelp.clicked.connect(onHelp)
     selector.onDrop = onAllDropped
