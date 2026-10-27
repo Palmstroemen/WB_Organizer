@@ -711,7 +711,6 @@ def prefDialog():
     showGRPpanel.setLayout(showGRPpanelLayout)
     r6 = QtWidgets.QRadioButton("show name", showGRPpanel)
     r6.setObjectName("showName")
-    #r6.setIcon(QtGui.QIcon(__pathIcons__ + "WBO_without_text.png"))
     r6.setToolTip("Show the selected group name in the title")
     r7 = QtWidgets.QRadioButton("hide name", showGRPpanel)
     r7.setObjectName("hideName")
