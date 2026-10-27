@@ -20,14 +20,13 @@ WBO further allows to **rename workbenches** whether to translate or to give it 
 Of course, you also find an 'All'-workbenches group to access workbenches the traditional way.
 
 ## Installation
-As long as the WBO is not available in the AddOn-Manager, you need to install it manually.
-1. Download the code from here to any place on your computer.
-2. Extract the zip file, if you have downloaded it as a zip file.
-3. RENAME the folder from "WB_Organizer_main" to "WB_Organizer". (I don't know why GitHub adds this "_main".
-4. move or copy the extracted folder inside your FreeCAD Mod folder, so that you get i.e.
-Linux:   `/home/user/.FreeCAD/Mod/WB_Organizer/InitGui.py`
-macOS:   `/Users/user_name/Library/Preferences/FreeCAD/Mod/WB_Organizer/InitGui.py`
-Windows: `C:\Users\user_name\AppData\Roaming\FreeCAD\Mod\WB_Organizer\InitGui.py`
+Install the WBO with FreeCAD's **Addon Manager** (menu -> Tools -> Addon manager): search for 'WB_Organizer', install it and restart FreeCAD.
+
+To install it manually instead:
+1. Download the code from here (Code -> Download ZIP) and extract it.
+2. RENAME the folder from "WB_Organizer-main" to "WB_Organizer". (GitHub adds the "-main".)
+3. Move the folder into the `Mod` folder inside FreeCAD's user data folder, so that you get i.e. `.../Mod/WB_Organizer/InitGui.py`. Type `App.getUserAppDataDir()` into FreeCAD's Python console to find the user data folder on your computer.
+
 On the next startup, FreeCAD will find your new AddOn.
 
 The WBO runs with FreeCAD 0.20 and newer, with Qt5 as well as with Qt6 (FreeCAD 1.x).
@@ -63,9 +62,6 @@ It has three columns:
 
 All changes are saved and shown immediately.
 
-**I especially like to kudos to TRIPLUS who has provided several very exciting tools like the 'Glass' AddOn, the 'PieMenu' AddOn, and the 'TabBar' Addon which this WBO is based on.** *The 'TabBar' AddOn has been kind of abandoned since 2017 or so. So I hijacked it and took it as a starting point for the development of WBO which saved me a lot of time.*
-
-
 ## Tips on how to use the Workbench Organizer right now
 The WBO is a workbench by itself and thus would live inside the workbenches at the top of your window.
 The problem with this is, that workbenches are somehow reordered on each change of a workbench. This leads to your WBO jumping around.
@@ -87,11 +83,11 @@ Alternatively, you can enter the **'Length when free floating'** in the 'prefere
 Confirm your changes with [Shift] + [Return] so as not to leave the whole dialog on [Return] and see an immediate result! 
 
 As we can't hide the standard workbench selector we want to put it a little bit 'out of our sight' to the top right.
-Go to the configuration panel (menu -> edit -> configurations (or so?))
+Go to the preferences (menu -> Edit -> Preferences)
 
 ![](./Resources/images/WBO_to_config.png)
 
-1. Select the Workbench dialog (the 3rd from the top), ...
+1. Select the 'Workbenches' page (the 3rd from the top), ...
 2. scroll down to the very bottom of the list, and ...
 3. select inside the dropdown to place the selector widget in the **top right corner** of the window.
 
@@ -141,6 +137,9 @@ So updating or reinstalling the WBO won't touch your settings.
 Older versions stored these files inside the WBO's own folder. On its first start, the new version copies them to the new place, so you keep your groups and names.
 
 You don't need to edit these files anymore. If you still do, close FreeCAD first and keep a backup: the files must be valid JSON.
+
+## Credits
+**I especially want to give kudos to TRIPLUS who has provided several very exciting tools like the 'Glass' AddOn, the 'PieMenu' AddOn, and the 'TabBar' AddOn which this WBO is based on.** *The 'TabBar' AddOn has been kind of abandoned since 2017 or so. So I hijacked it and took it as a starting point for the development of WBO which saved me a lot of time.*
 
 ## License
 The Workbench Organizer is licensed under the [GNU Lesser General Public License v2.1](License/lgpl-2.1.txt) or (at your option) any later version.
