@@ -141,3 +141,6 @@ So updating or reinstalling the WBO won't touch your settings.
 Older versions stored these files inside the WBO's own folder. On its first start, the new version copies them to the new place, so you keep your groups and names.
 
 You don't need to edit these files anymore. If you still do, close FreeCAD first and keep a backup: the files must be valid JSON.
+
+## License
+The Workbench Organizer is licensed under the [GNU Lesser General Public License v2.1](License/lgpl-2.1.txt) or (at your option) any later version.
