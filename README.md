@@ -138,6 +138,9 @@ Older versions stored these files inside the WBO's own folder. On its first star
 
 You don't need to edit these files anymore. If you still do, close FreeCAD first and keep a backup: the files must be valid JSON.
 
+## Troubleshooting
+**The toolbar won't move, undock, or react?** This is almost always FreeCAD's global **Lock toolbars** setting rather than the WBO itself: when it is on, *no* toolbar can be moved, not just this one. Switch it off under **View → Toolbars → Lock toolbars** (or right-click any toolbar). On a release candidate, a temporary toolbar regression in FreeCAD itself is also possible — testing a stable release or a newer weekly build helps tell the two apart.
+
 ## Credits
 **I especially want to give kudos to TRIPLUS who has provided several very exciting tools like the 'Glass' AddOn, the 'PieMenu' AddOn, and the 'TabBar' AddOn which this WBO is based on.** *The 'TabBar' AddOn has been kind of abandoned since 2017 or so. So I hijacked it and took it as a starting point for the development of WBO which saved me a lot of time.*
 
